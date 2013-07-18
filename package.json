@@ -11,9 +11,12 @@
     "test",
     "integration"
   ],
+  "bin": {
+    "marionette-mocha": "./bin/marionette-mocha"
+  },
   "dependencies" : {
     "debug": "*",
-    "mocha-json-proxy": "~0.0.1",
+    "mocha-json-proxy": "~0.0.2",
     "commander": "~1.3"
   },
   "devDependencies": {

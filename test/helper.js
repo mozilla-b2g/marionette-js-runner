@@ -8,4 +8,11 @@ function spawnMocha(argv) {
   return child = spawn(mocha, argv);
 }
 
+function spawnMarionette(argv) {
+  var bin = __dirname + '/../bin/marionette-mocha';
+  var spawn = require('child_process').spawn;
+  return child = spawn(bin, argv);
+}
+
 global.spawnMocha = spawnMocha;
+global.spawnMarionette = spawnMarionette;
