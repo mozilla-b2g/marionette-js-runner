@@ -4,12 +4,8 @@ node_modules:
 	npm install
 
 .PHONY: test
-test: node_modules integration
+test: node_modules
 	./node_modules/.bin/mocha \
 		test/mocha/child.js \
+		test/mocha/integration.js \
 		test/mocha/parent.js
-
-.PHONY: integration
-integration:
-	./node_modules/.bin/mocha test/mocha/integration
-

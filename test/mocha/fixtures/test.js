@@ -1,9 +1,8 @@
 suite('a test', function() {
   console.log('before running test log');
-  test('yey', function() {
+  test('test one', function() {
   });
 
-  test('pending');
   suite('another suite fail', function() {
     test('throw', function() {
       throw new Error('xxx');
@@ -11,9 +10,8 @@ suite('a test', function() {
   });
 
   test('multiple console logs', function(done) {
-    console.log('yey');
     setTimeout(function() {
-      console.log('another!');
+      console.log('works');
       done();
     });
   });
