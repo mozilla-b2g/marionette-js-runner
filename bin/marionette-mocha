@@ -1,0 +1,30 @@
+#! /usr/bin/env node
+
+var Parent = require('../lib/mocha/parent').Parent,
+    argv = process.argv.slice(2),
+    program = require('commander'),
+    Mocha = require('mocha');
+
+var parsedArgv = program.
+  option('-R, --reporter [reporter]', 'mocha reporter to use').
+  parse(process.argv);
+
+
+var Reporter;
+try {
+  Reporter = require(program.reporter)
+} catch(e) {
+  Reporter = require('mocha/lib/reporters/' + (program.reporter || 'dot'));
+}
+
+// attempt to find the reporter argument
+var runner = new Parent(argv);
+runner.run(Reporter);
+
+// pipe stdout & stderr.
+runner.process.stdout.pipe(process.stdout);
+runner.process.stderr.pipe(process.stderr);
+
+runner.process.on('exit', function(code) {
+  process.exit(code);
+});
