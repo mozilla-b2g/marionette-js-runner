@@ -1,6 +1,7 @@
 suite('mocha child', function() {
-  var Parent = require('../../lib/mocha/parent').Parent;
   var subject;
+  var Parent =
+    require('../lib/parentrunner').ParentRunner;
 
   suite('initialization', function() {
     var argv = [];
