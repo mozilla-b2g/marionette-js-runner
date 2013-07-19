@@ -19,7 +19,7 @@ suite('mocha integration', function() {
   }
 
   var MS_REGEXP = /(([0-9]+) ms)/;
-  var NEW_LINES = /(\n|(\s{2,99}))/g;
+  var NEW_LINES = /(\n|(\s{2,}))/g;
   function waitForProcess(child, done) {
     var results = aggregateOutput(child);
     child.on('exit', function(code) {
@@ -73,10 +73,7 @@ suite('mocha integration', function() {
       });
 
       test('stdout', function() {
-        assert.equal(
-          mochaOut.stdout.replace(MS_REGEXP, ''),
-          marionetteOut.stdout.replace(MS_REGEXP, '')
-        );
+        assert.equal(mochaOut.stdout, marionetteOut.stdout);
       });
 
       test('stderr', function() {
