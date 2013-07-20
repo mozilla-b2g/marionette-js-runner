@@ -1,5 +1,7 @@
-suite('mocha/child', function() {
-  var Child = require('../../lib/mocha/child').Child;
+suite('childrunner', function() {
+  var Child =
+    require('../lib/childrunner').ChildRunner;
+
   var Consumer = require('mocha-json-proxy/consumer');
 
   suite('#spawn', function() {

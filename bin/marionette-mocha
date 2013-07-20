@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-var Parent = require('../lib/mocha/parent').Parent,
+var Parent = require('../lib/parentrunner').ParentRunner,
     argv = process.argv.slice(2),
     program = require('commander'),
     Mocha = require('mocha');
