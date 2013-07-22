@@ -44,7 +44,7 @@ suite('mocha integration', function() {
     // this also tests picking up mocha.opts
     ['test', ['--reporter', 'spec']],
     ['pending', ['--reporter', 'spec']],
-    ['with-helper', ['--require', __dirname + '/fixtures/helper.js']]
+    ['with-helper', ['--require', __dirname + '/../fixtures/helper.js']]
   ];
 
   tests.forEach(function(pair) {
