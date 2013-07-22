@@ -3,11 +3,12 @@ suite('runtime/host', function() {
       Host = require('../../lib/runtime/host').Host;
 
   var subject,
-      hostId = 'magic_number';
+      hostId = 'magic_number',
+      port = 2828;
 
   setup(function(done) {
     mock.sent.on('createHost', function(reqId) {
-      process.emit('message', ['response', reqId, null, hostId]);
+      process.emit('message', ['response', reqId, null, hostId, port]);
     });
 
     Host.create(function(err, host) {
@@ -15,6 +16,10 @@ suite('runtime/host', function() {
       subject = host;
       done();
     });
+  });
+
+  test('.port', function() {
+    assert.equal(subject.port, port);
   });
 
   test('._id', function() {
