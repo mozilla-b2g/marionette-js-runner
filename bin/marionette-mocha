@@ -19,7 +19,7 @@ try {
 
 // attempt to find the reporter argument
 var runner = new Parent(argv);
-runner.run(Reporter);
+runner.run({ reporter: Reporter });
 
 // pipe stdout & stderr.
 runner.process.stdout.pipe(process.stdout);
