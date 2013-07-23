@@ -1,6 +1,6 @@
 suite('runtime/filterdata', function() {
   //var mock = mockProcessSend();
-  var filterdata = require('../../lib/runtime/filterdata').Filterdata;
+  var filterData = require('../../lib/runtime/filterdata').filterData;
   var obj1, obj2, obj3, obj4, obj5, obj6, obj7;
 
   setup(function() {
@@ -21,13 +21,13 @@ suite('runtime/filterdata', function() {
     assert.ok(obj5);
     assert.ok(obj6);
     assert.ok(obj7);
-    assert.ok(filterdata);
-    assert.equal(filterdata.validate(obj1,obj1), false);
-    assert.equal(filterdata.validate(obj1,obj2), true);
-    assert.equal(filterdata.validate(obj1,obj3), false);
-    assert.equal(filterdata.validate(obj1,obj4), false);
-    assert.equal(filterdata.validate(obj1,obj5), false);
-    assert.equal(filterdata.validate(obj1,obj6), true);
-    assert.equal(filterdata.validate(obj1,obj7), false);
+    assert.ok(filterData);
+    assert.equal(filterData.validate(obj1,obj1), false);
+    assert.equal(filterData.validate(obj1,obj2), true);
+    assert.equal(filterData.validate(obj1,obj3), false);
+    assert.equal(filterData.validate(obj1,obj4), false);
+    assert.equal(filterData.validate(obj1,obj5), false);
+    assert.equal(filterData.validate(obj1,obj6), true);
+    assert.equal(filterData.validate(obj1,obj7), false);
   });
 });
