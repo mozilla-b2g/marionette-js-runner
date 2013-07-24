@@ -1,33 +1,37 @@
 suite('runtime/filterdata', function() {
-  //var mock = mockProcessSend();
-  var filterData = require('../../lib/runtime/filterdata').filterData;
-  var obj1, obj2, obj3, obj4, obj5, obj6, obj7;
+  var FilterData = require('../../lib/runtime/filterdata').FilterData;
+  var filter, potential_metadata1, potential_metadata2, potential_metadata3,
+    potential_metadata4, potential_metadata5, potential_metadata6;
 
   setup(function() {
-      obj1 = {foo: 1, bar: "2", arr: [75, 234, 98]};
-      obj2 = {arr: 75, foo: 1, bar: "2"};
-      obj3 = {arr: 75, foo: 1, bar: 2};
-      obj4 = {foo: 1, bar: "2", arr: [75]};
-      obj5 = {arr: 75, foo: "2", bar: "2"};
-      obj6 = {arr: 75, foo: 1, bar: "2", hello: {}};
-      obj7 = {arr: 75, foo: 1};
+    filter = {foo: 1, bar: "2", host: ["firefox", "b2g-desktop", "device"]};
+    potential_metadata1 = {host: "firefox", foo: 1, bar: "2"};
+    potential_metadata2 = {host: "firefox", foo: 1, bar: 2};
+    potential_metadata3 = {host: 1, bar: "2", arr: ["firefox"]};
+    potential_metadata4 = {host: "firefox", foo: "2", bar: "2"};
+    potential_metadata5 = {host: "firefox", foo: 1, bar: "2", hello: {}};
+    potential_metadata6 = {host: "firefox", foo: 1};
   });
 
   test('validate', function() {
-    assert.ok(obj1);
-    assert.ok(obj2);
-    assert.ok(obj3);
-    assert.ok(obj4);
-    assert.ok(obj5);
-    assert.ok(obj6);
-    assert.ok(obj7);
-    assert.ok(filterData);
-    assert.equal(filterData.validate(obj1,obj1), false);
-    assert.equal(filterData.validate(obj1,obj2), true);
-    assert.equal(filterData.validate(obj1,obj3), false);
-    assert.equal(filterData.validate(obj1,obj4), false);
-    assert.equal(filterData.validate(obj1,obj5), false);
-    assert.equal(filterData.validate(obj1,obj6), true);
-    assert.equal(filterData.validate(obj1,obj7), false);
+    assert.equal(FilterData.validate(filter, filter), false);
+    assert.equal(FilterData.arrayCheck(filter.host, filter.host), false);
+    assert.equal(FilterData.validate(filter, potential_metadata1), true);
+    assert.equal(FilterData.arrayCheck(filter.host, potential_metadata1.host), true);
+    assert.equal(FilterData.any(filter.host, potential_metadata1.host), false);
+    assert.equal(FilterData.validate(filter, potential_metadata2), false);
+    assert.equal(FilterData.arrayCheck(filter.host, potential_metadata2.host), true);
+    assert.equal(FilterData.any(filter.host, potential_metadata2.host), false);
+    assert.equal(FilterData.validate(filter, potential_metadata3), false);
+    assert.equal(FilterData.arrayCheck(filter.host, potential_metadata3.host), false);
+    assert.equal(FilterData.validate(filter, potential_metadata4), false);
+    assert.equal(FilterData.arrayCheck(filter.host, potential_metadata4.host), true);
+    assert.equal(FilterData.any(filter.host, potential_metadata4.host), false);
+    assert.equal(FilterData.validate(filter, potential_metadata5), true);
+    assert.equal(FilterData.arrayCheck(filter.host, potential_metadata5.host), true);
+    assert.equal(FilterData.any(filter.host, potential_metadata5.host), false);
+    assert.equal(FilterData.validate(filter, potential_metadata6), false);
+    assert.equal(FilterData.arrayCheck(filter.host, potential_metadata6.host), true);
+    assert.equal(FilterData.any(filter.host, potential_metadata6.host), false);
   });
 });
