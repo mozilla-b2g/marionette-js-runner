@@ -1,1 +1,5 @@
 language: node_js
+script: "make ci"
+node_js:
+  - "0.10"
+  - "0.8"
