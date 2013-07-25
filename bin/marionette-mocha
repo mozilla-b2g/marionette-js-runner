@@ -7,19 +7,29 @@ var Parent = require('../lib/parentrunner').ParentRunner,
 
 var parsedArgv = program.
   option('-R, --reporter [reporter]', 'mocha reporter to use').
+  option('-H, --host [host]', 'host module to use ' +
+         'defaults to marionette-b2gdesktop-host').
   parse(process.argv);
 
 
 var Reporter;
 try {
-  Reporter = require(program.reporter)
-} catch(e) {
+  Reporter = require(program.reporter);
+} catch (e) {
   Reporter = require('mocha/lib/reporters/' + (program.reporter || 'dot'));
+}
+
+var Host;
+try {
+  Host = require(program.host);
+} catch (e) {
+  // b2g-desktop is the default host
+  Host = require('marionette-b2gdesktop-host/host');
 }
 
 // attempt to find the reporter argument
 var runner = new Parent(argv);
-runner.run(Reporter);
+runner.run({ reporter: Reporter, host: Host });
 
 // pipe stdout & stderr.
 runner.process.stdout.pipe(process.stdout);
