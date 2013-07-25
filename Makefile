@@ -17,6 +17,8 @@ test: node_modules b2g
 		test/mocha/parentrunner.js \
 		test/childrunner.js \
 		test/runtime.js \
+		test/runtime/filterdata.js \
+		test/marionette.js \
 		test/bin/marionette-mocha.js && \
 		make test-integration
 
