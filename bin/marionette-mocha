@@ -9,6 +9,10 @@ var parsedArgv = program.
   option('-R, --reporter [reporter]', 'mocha reporter to use').
   option('-H, --host [host]', 'host module to use ' +
          'defaults to marionette-b2gdesktop-host').
+  option('--profile-builder [builder]', 
+         'profile generation module').
+  option('--profile-base [json or js file]', 
+         'default profile options to use in all tests.').
   parse(process.argv);
 
 
@@ -24,12 +28,31 @@ try {
   Host = require(program.host);
 } catch (e) {
   // b2g-desktop is the default host
-  Host = require('marionette-b2gdesktop-host/host');
+  Host = require('marionette-b2gdesktop-host');
+}
+
+var ProfileBuilder;
+try {
+  ProfileBuilder = require(program.profileBuilder);
+} catch (e) {
+  ProfileBuilder = require('marionette-profile-builder');
+}
+
+// parse base profile options
+var profileBase;
+if (program.profileBase) {
+  // remember because require is used json files or JS files can be used.
+  profileBase = require(program.profileBase);
 }
 
 // attempt to find the reporter argument
 var runner = new Parent(argv);
-runner.run({ reporter: Reporter, host: Host });
+runner.run({
+  reporter: Reporter,
+  host: Host,
+  profileBuilder: ProfileBuilder,
+  profileBase: profileBase
+});
 
 // pipe stdout & stderr.
 runner.process.stdout.pipe(process.stdout);

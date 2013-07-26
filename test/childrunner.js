@@ -1,9 +1,44 @@
 suite('childrunner', function() {
+  var sinon;
+
+  setup(function() {
+    sinon = global.sinon.sandbox.create();
+  });
+
+  teardown(function() {
+    sinon.restore();
+  });
+
   var Child =
     require('../lib/childrunner').ChildRunner;
 
   var Consumer = require('mocha-json-proxy/consumer');
   var EventEmitter = require('events').EventEmitter;
+
+  /** profile builder */
+  function ProfileBuilder(options) {
+    this.options = options;
+
+    // used only in tests real implementations won't have this.
+    this.mockPath = '/path/to/profile';
+  }
+
+  ProfileBuilder.prototype = {
+    resetMock: function() {
+      this.buildCall = null;
+    },
+
+    build: function(overrides, callback) {
+      this.buildCall = overrides;
+      process.nextTick(callback.bind(null, null, this.mockPath));
+    },
+
+    destroy: function(callback) {
+      process.nextTick(callback);
+    }
+  };
+
+  /** host */
 
   function MockHost(options) {
     this.options = options;
@@ -12,44 +47,70 @@ suite('childrunner', function() {
   MockHost.metadata = { host: 'mock' };
 
   MockHost.prototype = {
-    start: function(callback) {
+    resetMock: function() {
+      this.startProfile = null;
+      this.startOptions = null;
+    },
+
+    start: function(profile, options, callback) {
+      this.startProfile = profile;
+      this.startOptions = options;
+
       process.nextTick(function() {
-        this.port = Math.floor(Math.random() * 100);
         this.started = true;
-        callback(null, this.port);
+        callback();
       }.bind(this));
     },
 
     stop: function(callback) {
-      callback();
-    },
-
-    restart: function(callback) {
-      callback();
+      process.nextTick(callback);
     }
   };
 
+  var argv = [
+    // test
+    __dirname + '/bin/fixtures/marionettetest',
+    // Spec included to verify its ignored here
+    '--reporter', 'Spec'
+  ];
+
+  var subject;
+  var profileBase = { settings: { x: true } };
+
+  setup(function() {
+    subject = new Child({
+      argv: argv,
+      host: MockHost,
+      profileBuilder: ProfileBuilder,
+      profileBase: profileBase
+    });
+  });
+
+  teardown(function(done) {
+    if (!subject.process)
+      return done();
+
+    subject.process.on('exit', function() {
+      done();
+    });
+    subject.process.kill();
+  });
+
   suite('#spawn', function() {
-    var argv = [
-      // test
-      __dirname + '/fixtures/test',
-      // Spec included to verify its ignored here
-      '--reporter', 'Spec'
-    ];
-
-    var subject;
-
     setup(function() {
-      subject = new Child({
-        argv: argv,
-        host: MockHost
-      });
-
       subject.spawn();
     });
 
-    test('.host', function() {
+    test('.hostClass', function() {
       assert.equal(subject.hostClass, MockHost);
+    });
+
+    test('.profileBase', function() {
+      assert.equal(subject.profileBase, profileBase);
+    });
+
+    test('.profileBuilderClass', function() {
+      assert.equal(subject.profileBuilderClass, ProfileBuilder);
     });
 
     test('.process', function() {
@@ -73,12 +134,56 @@ suite('childrunner', function() {
     });
   });
 
-  suite('ipc methods', function() {
+  suite('#profileOptions', function() {
+    var options,
+        result,
+        port = 2828;
+
     setup(function() {
-      subject = new Child({
-        argv: [__dirname + '/fixtures/noop'],
-        host: MockHost
-      });
+      options = { prefs: { x: true } };
+      result = subject.profileOptions(port, options);
+    });
+
+    test('should keep given prefs', function() {
+      // no clobbering
+      assert.equal(result.prefs.x, true, 'has given property');
+    });
+
+    test('marionette is enabled', function() {
+      assert.ok(
+        result.prefs['marionette.defaultPrefs.enabled'],
+        'marionette is enabled'
+      );
+    });
+
+    test('marionette port matches given port', function() {
+      assert.equal(
+        result.prefs['marionette.defaultPrefs.port'],
+        port,
+        'port setting should match given port'
+      );
+    });
+  });
+
+  suite('host methods', function() {
+    function hostMethodResult(result, done) {
+      for (var key in result)
+        result[key] = null;
+
+      return function(err, meta) {
+        // copy all of the remote properties
+        var remote = subject._remotes[meta.id];
+        for (var key in remote) {
+          result[key] = remote[key];
+        }
+
+        // and a reference to the returned meta
+        result.meta = meta;
+        done(err);
+      };
+    }
+
+    setup(function() {
       subject.spawn();
     });
 
@@ -97,63 +202,127 @@ suite('childrunner', function() {
       };
     });
 
-    var host,
-        hostId,
-        meta;
-
-    setup(function(done) {
-      host = null;
-      hostId = null;
-      meta = null;
-
-      sent.once(99, function(err, givenHostId, givenMeta) {
-        hostId = givenHostId;
-        host = subject._hosts[hostId];
-        meta = givenMeta;
-        done();
+    suite('#createHost', function() {
+      var host = {};
+      setup(function(done) {
+        subject.createHost(hostMethodResult(host, done));
       });
 
-      subject.process.emit('message', ['createHost', 99]);
-    });
-
-    test('#createHost', function() {
-      assert.ok(host, 'has host');
-      assert.ok(host.started, 'host started');
-      assert.equal(host.port, meta.port, 'port');
-      assert.deepEqual(meta.metadata, MockHost.metadata, 'metadata');
-    });
-
-    test('#restartHost', function(done) {
-      // used to simulate port changes during a restart.
-      var newPortValue = 666;
-
-      host.restart = function(callback) {
-        // change the port while restarting
-        host.port = newPortValue;
-        process.nextTick(callback);
-      };
-
-      sent.once(2, function(err, meta) {
-        assert.equal(meta.port, host.port);
-        done();
+      test('profile builder base options', function() {
+        assert.deepEqual(
+          host.profileBuilder.options,
+          profileBase
+        );
       });
 
-      subject.process.emit('message', ['restartHost', 2, hostId]);
-    });
-
-    test('#stopHost', function(done) {
-      var stopped = false;
-      host.stop = function(callback) {
-        stopped = true;
-        process.nextTick(callback);
-      };
-
-      sent.once(3, function() {
-        assert.ok(stopped);
-        done();
+      test('remote.port', function() {
+        assert.ok(typeof host.port === 'number', 'is number');
       });
 
-      subject.process.emit('message', ['stopHost', 3, hostId]);
+      test('meta sent to child', function() {
+        assert.deepEqual(
+          subject._remoteDetails(host),
+          host.meta
+        );
+      });
+
+      test('created profile', function() {
+        var expected = subject.profileOptions(host.port);
+        assert.deepEqual(
+          host.profileBuilder.buildCall,
+          expected
+        );
+      });
+
+      test('host profile', function() {
+        assert.equal(
+          host.profileBuilder.mockPath,
+          host.host.startProfile
+        );
+      });
+    });
+
+    suite('#restartHost', function() {
+      var create = {};
+      var restart = {};
+
+      // create the initial host
+      setup(function(done) {
+        subject.createHost(hostMethodResult(create, done));
+      });
+
+      // change the path of the profile to verify the restart
+      setup(function(done) {
+        // change the mocks
+        create.profileBuilder.mockPath = '/new/path';
+        create.profileBuilder.resetMock();
+        create.host.resetMock();
+
+        // trigger restart
+        subject.restartHost(create.id, hostMethodResult(restart, done));
+      });
+
+      test('changed port', function() {
+        assert.notEqual(create.meta.port, restart.meta.port);
+      });
+
+      test('rebuilding of profile', function() {
+        assert.deepEqual(
+          subject.profileOptions(restart.port),
+          restart.profileBuilder.buildCall
+        );
+      });
+
+      test('host should be given port as option', function() {
+        assert.deepEqual(
+          restart.host.startOptions,
+          { port: restart.port }
+        );
+      });
+
+      test('host should be given new path', function() {
+        assert.equal(
+          restart.host.startProfile,
+          restart.profileBuilder.mockPath
+        );
+      });
+    });
+
+    suite('#stopHost', function() {
+      var create = {};
+      var host;
+      var builder;
+
+      setup(function(done) {
+        subject.createHost(hostMethodResult(create, done));
+      });
+
+      setup(function() {
+        host = create.host;
+        builder = create.profileBuilder;
+      });
+
+      test('calls destroy / stop', function(done) {
+        var destroyed = false;
+        var stopped = false;
+
+        builder.destroy = function(callback) {
+          destroyed = true;
+          process.nextTick(callback);
+        };
+
+        host.stop = function(callback) {
+          stopped = true;
+          process.nextTick(callback);
+        };
+
+        subject.stopHost(create.id, function(err) {
+          if (err) return done(err);
+          assert.ok(destroyed, 'destroys profile');
+          assert.ok(stopped, 'stops host');
+          done();
+        });
+      });
     });
 
   });

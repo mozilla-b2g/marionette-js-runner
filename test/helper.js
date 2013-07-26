@@ -2,6 +2,10 @@ var EventEmitter = require('events').EventEmitter,
     fs = require('fs');
 
 global.assert = require('assert');
+global.sinon = require('sinon');
+
+// so we can call assert.calledWith
+global.sinon.assert.expose(assert, { prefix: '' });
 
 function spawnMocha(argv) {
   var mocha = __dirname + '/../node_modules/.bin/mocha';
@@ -42,7 +46,6 @@ function mockProcessSend() {
 
   return refs;
 }
-
 
 global.mockProcessSend = mockProcessSend;
 global.spawnMocha = spawnMocha;
