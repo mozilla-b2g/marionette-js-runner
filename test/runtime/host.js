@@ -8,7 +8,9 @@ suite('runtime/host', function() {
 
   setup(function(done) {
     mock.sent.on('createHost', function(reqId) {
-      process.emit('message', ['response', reqId, null, hostId, port]);
+      process.emit(
+        'message', ['response', reqId, null, hostId, { port: port }]
+      );
     });
 
     Host.create(function(err, host) {
