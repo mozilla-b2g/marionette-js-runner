@@ -6,19 +6,22 @@ b2g:
 node_modules:
 	npm install
 
+.PHONY: test
+test: node_modules b2g test-unit test-integration
+
 .PHONY: test-integration
 test-integration:
-	./bin/marionette-mocha \
-		find test/integration -t 100s
+	./bin/marionette-mocha $(shell find test/integration) -t 100s
 
-.PHONY: test
-test: node_modules b2g
+.PHONY: test-unit
+test-unit:
 	./node_modules/.bin/mocha -t 100s \
 		test/mocha/parentrunner.js \
 		test/childrunner.js \
 		test/runtime.js \
-		test/bin/marionette-mocha.js && \
-		make test-integration
+		test/runtime/*.js \
+		test/marionette.js \
+		test/bin/marionette-mocha.js
 
 .PHONY: ci
 ci:

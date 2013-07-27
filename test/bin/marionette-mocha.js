@@ -28,7 +28,7 @@ suite('mocha integration', function() {
       // bugs but prevent us from verifying real content so they are stripped.
       ['stderr', 'stdout'].forEach(function(field) {
         [MS_REGEXP, NEW_LINES].forEach(function(regex) {
-          result[field] = result[field].replace(regex, '');
+          result[field] = result[field].replace(regex, '').trim();
         });
       });
 

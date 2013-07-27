@@ -4,6 +4,7 @@ suite('runtime/requests', function() {
 
   suite('emit', function() {
     test('single emit', function(done) {
+      var pending = Object.keys(subject.pending).length;
       var expectedValue = 1;
 
       mock.sent.once('do stuff', function(responseId) {
@@ -12,7 +13,7 @@ suite('runtime/requests', function() {
 
       subject.emit('do stuff', function(gotValue) {
         assert.equal(gotValue, expectedValue);
-        assert.equal(Object.keys(subject.pending).length, 0);
+        assert.equal(Object.keys(subject.pending).length, pending);
         done();
       });
     });
@@ -21,9 +22,13 @@ suite('runtime/requests', function() {
       var event = 'i can sendz',
           pending = 3;
 
+
+      // because requests is a singleton we need to keep track of global state.
+      var pendingAtStart = Object.keys(subject.pending).length;
+
       // fired when all callbacks complete
       function complete() {
-        assert.equal(Object.keys(subject.pending).length, 0);
+        assert.equal(Object.keys(subject.pending).length, pendingAtStart);
         done();
       }
 
