@@ -18,24 +18,19 @@ var parsedArgv = program.
 var Reporter;
 try {
   Reporter = require(program.reporter);
-} catch (e) {
+} catch(e) {
   Reporter = require('mocha/lib/reporters/' + (program.reporter || 'dot'));
 }
 
-var Host;
-try {
-  Host = require(program.host);
-} catch (e) {
-  // b2g-desktop is the default host
-  Host = require('marionette-b2gdesktop-host');
-}
+// we default to b2g-desktop which is the most reliable.
+program.host =
+  program.host || 'marionette-b2gdesktop-host';
 
-var ProfileBuilder;
-try {
-  ProfileBuilder = require(program.profileBuilder);
-} catch (e) {
-  ProfileBuilder = require('marionette-profile-builder');
-}
+program.profileBuilder =
+  program.profileBuilder || 'marionette-profile-builder';
+
+var Host = require(program.host),
+    ProfileBuilder = require(program.profileBuilder);
 
 // parse base profile options
 var profileBase;

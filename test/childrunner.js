@@ -69,7 +69,7 @@ suite('childrunner', function() {
 
   var argv = [
     // test
-    __dirname + '/bin/fixtures/marionettetest',
+    __dirname + '/fixtures/test',
     // Spec included to verify its ignored here
     '--reporter', 'Spec'
   ];
@@ -204,8 +204,9 @@ suite('childrunner', function() {
 
     suite('#createHost', function() {
       var host = {};
+      var profileOverrides = { settings: { x: true } };
       setup(function(done) {
-        subject.createHost(hostMethodResult(host, done));
+        subject.createHost(profileOverrides, hostMethodResult(host, done));
       });
 
       test('profile builder base options', function() {
@@ -228,6 +229,8 @@ suite('childrunner', function() {
 
       test('created profile', function() {
         var expected = subject.profileOptions(host.port);
+        expected.settings = profileOverrides.settings;
+
         assert.deepEqual(
           host.profileBuilder.buildCall,
           expected
@@ -243,12 +246,13 @@ suite('childrunner', function() {
     });
 
     suite('#restartHost', function() {
+      var overrides = { settings: { x: true } };
       var create = {};
       var restart = {};
 
       // create the initial host
       setup(function(done) {
-        subject.createHost(hostMethodResult(create, done));
+        subject.createHost({}, hostMethodResult(create, done));
       });
 
       // change the path of the profile to verify the restart
@@ -259,7 +263,11 @@ suite('childrunner', function() {
         create.host.resetMock();
 
         // trigger restart
-        subject.restartHost(create.id, hostMethodResult(restart, done));
+        subject.restartHost(
+          create.id,
+          overrides,
+          hostMethodResult(restart, done)
+        );
       });
 
       test('changed port', function() {
@@ -267,8 +275,11 @@ suite('childrunner', function() {
       });
 
       test('rebuilding of profile', function() {
+        var expected = subject.profileOptions(restart.port);
+        expected.settings = overrides.settings;
+
         assert.deepEqual(
-          subject.profileOptions(restart.port),
+          expected,
           restart.profileBuilder.buildCall
         );
       });
@@ -294,7 +305,7 @@ suite('childrunner', function() {
       var builder;
 
       setup(function(done) {
-        subject.createHost(hostMethodResult(create, done));
+        subject.createHost({}, hostMethodResult(create, done));
       });
 
       setup(function() {
