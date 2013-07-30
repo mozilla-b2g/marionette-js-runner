@@ -80,8 +80,8 @@ suite('childrunner', function() {
   setup(function() {
     subject = new Child({
       argv: argv,
-      host: MockHost,
-      profileBuilder: ProfileBuilder,
+      ProfileBuilder: ProfileBuilder,
+      Host: MockHost,
       profileBase: profileBase
     });
   });
@@ -101,16 +101,16 @@ suite('childrunner', function() {
       subject.spawn();
     });
 
-    test('.hostClass', function() {
-      assert.equal(subject.hostClass, MockHost);
+    test('.Host', function() {
+      assert.equal(subject.Host, MockHost);
     });
 
     test('.profileBase', function() {
       assert.equal(subject.profileBase, profileBase);
     });
 
-    test('.profileBuilderClass', function() {
-      assert.equal(subject.profileBuilderClass, ProfileBuilder);
+    test('.ProfileBuilder', function() {
+      assert.equal(subject.ProfileBuilder, ProfileBuilder);
     });
 
     test('.process', function() {

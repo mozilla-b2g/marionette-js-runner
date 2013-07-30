@@ -48,9 +48,9 @@ if (program.profileBase) {
 // attempt to find the reporter argument
 var runner = new Parent(argv);
 runner.run({
-  reporter: Reporter,
-  host: Host,
-  profileBuilder: ProfileBuilder,
+  Reporter: Reporter,
+  Host: Host,
+  ProfileBuilder: ProfileBuilder,
   profileBase: profileBase
 });
 
