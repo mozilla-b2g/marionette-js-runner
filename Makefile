@@ -12,7 +12,7 @@ test: node_modules b2g test-unit test-integration
 .PHONY: lint
 lint:
 	gjslint --recurse . \
-		--disable "210,217,220,225" \
+		--disable "220,225" \
 		--exclude_directories "examples,node_modules,b2g,api-design"
 
 .PHONY: test-integration
