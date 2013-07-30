@@ -14,7 +14,7 @@ suite('runtime/host', function() {
       );
     });
 
-    Host.create(function(err, host) {
+    Host.create({}, function(err, host) {
       if (err) return done(err);
       subject = host;
       done();
@@ -44,7 +44,7 @@ suite('runtime/host', function() {
       done();
     });
 
-    subject.restart(function() {});
+    subject.restart({}, function() {});
   });
 
 });
