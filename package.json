@@ -1,6 +1,6 @@
 {
   "name": "marionette-js-runner",
-  "version": "0.1.2",
+  "version": "0.0.1",
   "author": "James Lal [:lightsofapollo]",
   "description": "Utility module for installing an app as preloaded & packaged app",
   "main": "index.js",
@@ -18,11 +18,15 @@
     "debug": "*",
     "mocha-json-proxy": "~0.0.2",
     "commander": "~1.3",
-    "marionette-b2gdesktop-host": "~0.4"
+    "marionette-b2gdesktop-host": "~0.5.0-alpha",
+    "marionette-profile-builder": "0.0.1",
+    "empty-port": "~0.0.1"
   },
   "devDependencies": {
     "mocha": "~1.12",
-    "marionette-client": ">=0.10.0"
+    "mozilla-download": "~0.2.1",
+    "marionette-client": ">=0.10.0",
+    "sinon": "~1.7"
   },
   "peerDependencies": {
     "marionette-client": ">=0.10.0"

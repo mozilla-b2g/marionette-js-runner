@@ -83,4 +83,40 @@ suite('mocha integration', function() {
     });
   });
 
+  suite('--host', function() {
+    var result,
+        argv = [
+          '--ui', 'tdd',
+          '--host', __dirname + '/fixtures/host',
+          __dirname + '/fixtures/marionettetest'
+        ];
+
+    setup(function(done) {
+      var proc = spawnMarionette(argv);
+      result = waitForProcess(proc, done);
+    });
+
+    test('exits with magic code', function() {
+      assert.equal(result.code, 55, JSON.stringify(result));
+    });
+  });
+
+  suite('--profile-builder', function() {
+    var result,
+        argv = [
+          '--ui', 'tdd',
+          '--profile-builder', __dirname + '/fixtures/builder',
+          __dirname + '/fixtures/marionettetest'
+        ];
+
+    setup(function(done) {
+      var proc = spawnMarionette(argv);
+      result = waitForProcess(proc, done);
+    });
+
+    test('exits with magic code', function() {
+      assert.equal(result.code, 66, JSON.stringify(result));
+    });
+  });
+
 });
