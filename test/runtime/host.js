@@ -9,7 +9,8 @@ suite('runtime/host', function() {
   setup(function(done) {
     mock.sent.on('createHost', function(reqId) {
       process.emit(
-        'message', ['response', reqId, null, hostId, { port: port }]
+        'message',
+        ['response', reqId, null, { id: hostId, port: port }]
       );
     });
 
@@ -24,8 +25,8 @@ suite('runtime/host', function() {
     assert.equal(subject.port, port);
   });
 
-  test('._id', function() {
-    assert.equal(subject._id, hostId);
+  test('.id', function() {
+    assert.equal(subject.id, hostId);
   });
 
   test('#stop', function(done) {

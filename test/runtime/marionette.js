@@ -1,7 +1,7 @@
 suite('Marionette', function() {
   var marionette = require('../../lib/runtime/marionette').marionette;
   var filter = {
-    foo: 1, bar: "2", host: ["firefox", "b2g-desktop", "device"]
+    foo: 1, bar: '2', host: ['firefox', 'b2g-desktop', 'device']
   };
 
   var originalMeta;

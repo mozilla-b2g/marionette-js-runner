@@ -48,7 +48,7 @@ suite('runtime/filterdata', function() {
       'metadata property exists but not in array',
       { host: ['a', 'b'] },
       { host: 'c' }
-    )
+    );
 
     valid(
       'filter requires multiple properties',

@@ -17,7 +17,7 @@ suite('default host', function() {
     var Driver = require('marionette-client').Drivers.Tcp;
 
     test('connect', function(done) {
-      var driver = new Driver({ port: this.defaultHost.port })
+      var driver = new Driver({ port: this.defaultHost.port });
       driver.connect(done);
     });
   });
