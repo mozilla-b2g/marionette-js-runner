@@ -14,13 +14,8 @@ for more details about the intent of the project and where it's going.
 
 add marionette-js-runner and marionette-js-client to your project
 
-```json
-{
-  "devDependencies": {
-    "marionette-client": "...",
-    "marionette-js-runner": "..."
-  }
-}
+```sh
+npm install --save-dev marionette-client marionette-js-runner
 ```
 
 Invoke a marionette-mocha test
@@ -32,7 +27,11 @@ Invoke a marionette-mocha test
 
 See `./node_modules/.bin/marionette-mocha --help` for more docs on what it can do.
 
-## Exposed APIs for wirting marionette tests
+## Exposed APIs for writing marionette tests
+
+- [`marionette` (suite/describe like a api)](#marionette-suitedescribe-like-a-api)
+- [`marionette.client` (marionette client interface)](##marionetteclient-marionette-client-interface)
+- [`marionette.plugin` (plugin exposure/setup api)](#marionetteplugin-plugin-exposuresetup-api)
 
 ## `marionette` (suite/describe like a api)
 
@@ -107,7 +106,7 @@ marionette('my custom app', function() {
 ```
 
 Clients have different "driver" types which determine how they connect with the marionette server.
-Typically you don't need to think about this but, it is important to note that the default driver is synchronous
+Typically you don't need to think about this, but it is important to note that the default driver is synchronous
 which means each marionette operation blocks (you can't really run servers in the same process).
 
 ```js
