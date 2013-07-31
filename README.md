@@ -129,7 +129,7 @@ marionette('be async man', function() {
 })
 ```
 
-Finally you can also create multiple clients.
+Multiple clients can also be created.
 
 ```js
 marionette('I like sending emails to myself', function() {
