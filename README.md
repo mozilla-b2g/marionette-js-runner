@@ -30,7 +30,7 @@ See `./node_modules/.bin/marionette-mocha --help` for more docs on what it can d
 ## Exposed APIs for writing marionette tests
 
 - [`marionette` (suite/describe like a api)](#marionette-suitedescribe-like-a-api)
-- [`marionette.client` (marionette client interface)](##marionetteclient-marionette-client-interface)
+- [`marionette.client` (marionette client interface)](#marionetteclient-marionette-client-interface)
 - [`marionette.plugin` (plugin exposure/setup api)](#marionetteplugin-plugin-exposuresetup-api)
 
 ## `marionette` (suite/describe like a api)
