@@ -6,7 +6,7 @@ This project is the sum of a number of other smaller more focused projects:
   - [marionette-profile-builder](https://github.com/mozilla-b2g/marionette-profile-builder)
   - [marionette-b2gdesktop-host](https://github.com/mozilla-b2g/marionette-b2gdesktop-host)
 
-See [MDN](https://developer.mozilla.org/en-US/docs/Marionette/Marionette_JavaScript_Tools) 
+See [MDN](https://developer.mozilla.org/en-US/docs/Marionette/Marionette_JavaScript_Tools)
 for more details about the intent of the project and where it's going.
 
 ## Installing / Invoking tests
@@ -142,9 +142,9 @@ marionette('I like sending emails to myself', function() {
 
 ## `marionette.plugin` (plugin exposure/setup api)
 
-One of the features of the client is extending its functionality without modiying the base code.
+One of the features of the client is extending its functionality without modifying the base code.
 For example if you wanted to extend the client to
-[launch apps](https://github.com/mozilla-b2g/marionette-apps) you, can do that by exposing a new plugin.
+[launch apps](https://github.com/mozilla-b2g/marionette-apps) this can be done by exposing a new plugin.
 
 
 ```js
