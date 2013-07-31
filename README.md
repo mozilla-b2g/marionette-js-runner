@@ -139,3 +139,42 @@ marionette('I like sending emails to msyelf', function() {
   // do something fancy like send an email from one client to another
 });
 ```
+
+## `marionette.plugin` add a plugin to all marionette client interfaces.
+
+One of the features of the client is extending its functionality without modiying the base code.
+So if for example you wanted to extend the client to have an interface to
+[launch apps](https://github.com/mozilla-b2g/marionette-apps) you can do that.
+
+
+```js
+// the particular case is based on: https://github.com/mozilla-b2g/marionette-apps
+
+// expose something at the global level to all tests (you can do this from a helper file too)
+marionette.plugin('apps', require('marionette-apps'));
+
+marionette('my local test', function() {
+  var client = marionette.client();
+  var origin = 'app://calendar.gaiamobile.org';
+  
+  // this plugin only exists inside of this "marionette" block
+  marionette.plugin('myplugin', function() {
+    return ...;
+  });
+  
+  setup(function() {
+    client.apps.launch(origin);
+    client.apps.switchToApp(origin);
+  });
+  
+  test('that calendar works', function() {
+    // do some calendar testing inside of its frame
+  });
+  
+  test('myplugin', function() {
+    // leverage your custom plugin
+    client.myplugin.doStuff();
+  });
+})
+
+```
