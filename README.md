@@ -7,7 +7,7 @@ This project is the sum of a number of other smaller more focused projects:
   - [marionette-b2gdesktop-host](https://github.com/mozilla-b2g/marionette-b2gdesktop-host)
 
 See [MDN](https://developer.mozilla.org/en-US/docs/Marionette/Marionette_JavaScript_Tools) 
-for more details about the intent of the project and where its going.
+for more details about the intent of the project and where it's going.
 
 ## Installing / Invoking tests
 
@@ -30,7 +30,7 @@ Invoke a marionette-mocha test
 ./node_modules/.bin/marionette-mocha path/to/test.js
 ```
 
-See `marionette-mocha --help` for more docs on what it can do.
+See `./node_modules/.bin/marionette-mocha --help` for more docs on what it can do.
 
 ## Exposed APIs for wirting marionette tests
 
@@ -41,7 +41,7 @@ They expose an additional field (a filter) which is an object which describes un
 conditions a test may execute. 
 
 The filter is matched vs metadata from the particular host (like firefox / b2g-desktop ) the test is running on.
-[Example host metdata](https://github.com/mozilla-b2g/marionette-b2gdesktop-host/blob/105552c46f0e384627bce19b242f2de94e06c633/index.js#L33)
+[Example host metadata](https://github.com/mozilla-b2g/marionette-b2gdesktop-host/blob/105552c46f0e384627bce19b242f2de94e06c633/index.js#L33)
 
 ```js
 // this always runs
@@ -59,7 +59,7 @@ marionette('b2g desktop or firefox', { host: ['firefox', 'b2g-desktop'] }, funct
 });
 ```
 
-## `marionette.client` (creates a marionette client interface)
+## `marionette.client` (marionette client interface)
 
 Creating a client is easy. Each test will run in a completely clean state ( with its own profile ).
 The default client has no profile options and is sync.
@@ -81,7 +81,7 @@ marionette('github.com', function() {
 })
 ```
 
-Clients can be configured to have custom profiles (lets say you want a custom app, change a setting, etc..)
+Clients can be configured to have custom profiles. For instance, let's say you want to test a packaged app with specialized settings...
 
 ```js
 marionette('my custom app', function() {
@@ -106,8 +106,8 @@ marionette('my custom app', function() {
 })
 ```
 
-Client have different "driver" types which determine how they connect with the marionette server.
-Typically you don't need to think about this but it is important to note that the default driver is synchronous
+Clients have different "driver" types which determine how they connect with the marionette server.
+Typically you don't need to think about this but, it is important to note that the default driver is synchronous
 which means each marionette operation blocks (you can't really run servers in the same process).
 
 ```js
@@ -132,7 +132,7 @@ marionette('be async man', function() {
 Finally you can also create multiple clients.
 
 ```js
-marionette('I like sending emails to msyelf', function() {
+marionette('I like sending emails to myself', function() {
   var clientA = marionette.client();
   var clientB = marionette.client();
   
@@ -140,11 +140,11 @@ marionette('I like sending emails to msyelf', function() {
 });
 ```
 
-## `marionette.plugin` add a plugin to all marionette client interfaces.
+## `marionette.plugin` (plugin exposure/setup api)
 
 One of the features of the client is extending its functionality without modiying the base code.
-So if for example you wanted to extend the client to have an interface to
-[launch apps](https://github.com/mozilla-b2g/marionette-apps) you can do that.
+For example if you wanted to extend the client to
+[launch apps](https://github.com/mozilla-b2g/marionette-apps) you, can do that by exposing a new plugin.
 
 
 ```js
@@ -157,9 +157,11 @@ marionette('my local test', function() {
   var client = marionette.client();
   var origin = 'app://calendar.gaiamobile.org';
   
-  // this plugin only exists inside of this "marionette" block
-  marionette.plugin('myplugin', function() {
-    return ...;
+  // this plugin only exists inside the current "marionette(function() { ... })" block
+  marionette.plugin('myplugin', function(client) {
+    return {
+      doStuff: function() {}
+    };
   });
   
   setup(function() {
