@@ -1,5 +1,6 @@
 suite('mocha integration', function() {
   var fs = require('fs');
+  var path = require('path');
 
   function aggregateOutput(childProcess) {
     var result = {
@@ -117,6 +118,98 @@ suite('mocha integration', function() {
     test('exits with magic code', function() {
       assert.equal(result.code, 66, JSON.stringify(result));
     });
+  });
+
+  suite('--manifest', function() {
+
+    test('exits with status code 1 when file is not found', function(done) {
+      var filename = 'non-existent-file.json';
+      var argv = ['--manifest', filename];
+      var proc = spawnMarionette(argv);
+
+      // Ensure that dummy file does not actually exist
+      assert.ok(!fs.existsSync(filename));
+
+      result = waitForProcess(proc, function() {
+        assert.equal(result.code, 1);
+        done();
+      });
+    });
+
+    test('exits with status code 1 when file is not JSON-formatted',
+      function(done) {
+      var argv = ['--manifest', __filename];
+      var proc = spawnMarionette(argv);
+      result = waitForProcess(proc, function() {
+        assert.equal(result.code, 1);
+        done();
+      });
+    });
+
+    suite('absolute paths', function() {
+
+      test('blacklisted files', function(done) {
+        var argv = [
+          '--manifest',
+          path.join(__dirname, 'fixtures', 'manifest-blacklist.json'),
+          path.join(__dirname, 'fixtures', 'manifest-test-skip.js'),
+          path.join(__dirname, 'fixtures', 'manifest-test-use.js')
+        ];
+        var proc = spawnMarionette(argv);
+        result = waitForProcess(proc, function() {
+          assert.equal(result.code, 23);
+          done();
+        });
+      });
+
+      test('whitelisted files', function(done) {
+        var argv = [
+          '--manifest',
+          path.join(__dirname, 'fixtures', 'manifest-whitelist.json'),
+          path.join(__dirname, 'fixtures', 'manifest-test-skip.js'),
+          path.join(__dirname, 'fixtures', 'manifest-test-use.js')
+        ];
+        var proc = spawnMarionette(argv);
+        result = waitForProcess(proc, function() {
+          assert.equal(result.code, 23);
+          done();
+        });
+      });
+
+    });
+
+    suite('relative paths', function() {
+
+      test('blacklisted files', function(done) {
+        var argv = [
+          '--manifest',
+          path.join(__dirname, 'fixtures', 'manifest-blacklist.json'),
+          path.join('test', 'bin', 'fixtures', 'manifest-test-skip.js'),
+          path.join('test', 'bin', 'fixtures', 'manifest-test-use.js')
+        ];
+        var proc = spawnMarionette(argv);
+        result = waitForProcess(proc, function() {
+          assert.equal(result.code, 23);
+          done();
+        });
+      });
+
+      test('whitelisted files', function(done) {
+        var argv = [
+          '--manifest',
+          path.join('test', 'bin', 'fixtures', 'manifest-whitelist.json'),
+          path.join('test', 'bin', 'fixtures', 'manifest-test-skip.js'),
+          path.join('test', 'bin', 'fixtures', 'manifest-test-use.js')
+        ];
+        var proc = spawnMarionette(argv);
+        result = waitForProcess(proc, function() {
+          assert.equal(result.code, 23);
+          done();
+        });
+      });
+
+    });
+
   });
 
 });
