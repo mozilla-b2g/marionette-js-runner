@@ -3,15 +3,16 @@
 var Mocha = require('mocha'),
     Parent = require('../lib/parentrunner').ParentRunner,
     fs = require('fs'),
+    fsPath = require('path'),
     argv = process.argv.slice(2),
     program = require('commander'),
     applyManifest;
 
 var parsedArgv = program.
-  option('-H, --host [host]', 
+  option('-H, --host [host]',
          'host module to use defaults to marionette-b2gdesktop-host').
   option('-R, --reporter [reporter]', 'mocha reporter to use').
-  option('--profile-base [json or js file]', 
+  option('--profile-base [json or js file]',
          'default profile options to use in all tests.').
   option('--profile-builder [builder]', 'profile generation module').
   option('-M, --manifest [manifest]', 'relative path to a JSON-formatted ' +
@@ -48,10 +49,31 @@ var parsedArgv = program.
   .option('--interfaces', 'display available interfaces')
   .option('--reporters', 'display available reporters')
   .option('--compilers <ext>:<module>,...',
-    'use the given module(s) to compile files')
+    'use the given module(s) to compile files');
 
-  .parse(process.argv);
 
+// marionette-mocha.opts
+var OPTS_FILE = 'marionette-mocha.opts';
+
+[
+  // remember these are relative to cwd
+  'test/',
+  'tests/',
+  ''
+].forEach(function(path) {
+  var opts = fsPath.join(path, OPTS_FILE);
+  if (fs.existsSync(opts)) {
+    // remember require is cached
+    process.argv.splice.apply(
+      process.argv,
+      [2, 0].concat(require('../lib/optsfileparser')(opts))
+    );
+  }
+});
+
+// parse process.argv
+
+program.parse(process.argv);
 
 var Reporter;
 try {
@@ -74,7 +96,9 @@ var Host = require(program.host),
 var profileBase;
 if (program.profileBase) {
   // remember because require is used json files or JS files can be used.
-  profileBase = require(program.profileBase);
+  // the path is resolved since it should be relative to cwd rather than this
+  // executable.
+  profileBase = require(fsPath.resolve(program.profileBase));
 }
 
 if (program.manifest) {

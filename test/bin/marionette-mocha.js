@@ -19,7 +19,7 @@ suite('mocha integration', function() {
     return result;
   }
 
-  var MS_REGEXP = /(([0-9]+) ms)/;
+  var MS_REGEXP = /(([0-9]+) ?ms)/;
   var NEW_LINES = /(\n|(\s{2,}))/g;
   function waitForProcess(child, done) {
     var result = aggregateOutput(child);

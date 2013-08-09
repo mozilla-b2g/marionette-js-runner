@@ -29,6 +29,19 @@ Invoke a marionette-mocha test
 
 See `./node_modules/.bin/marionette-mocha --help` for more docs on what it can do.
 
+Like mocha there is support for an "opts" file which will be
+loaded with the specific configuration for your project.
+
+The file must be called "marionette-mocha.opts" and live in one of the
+following locations:
+
+- test/
+- tests/
+- root of your project
+
+Each location will be loaded if found. Any option that can be
+passed into `marionette-mocha` (see --help) can be placed in this file.
+
 ## Exposed APIs for writing marionette tests
 
 - [`marionette` (suite/describe like a api)](#marionette-suitedescribe-like-a-api)
