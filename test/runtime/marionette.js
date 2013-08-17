@@ -39,9 +39,19 @@ suite('Marionette', function() {
     });
 
     suite('failure', function() {
+      var c_error;
+
       setup(function() {
+        // Supress expected error messages
+        c_error = console.error;
+        console.error = function() {};
+
         process.env.CHILD_METADATA = 'IAM_NOT_BASE_64_OR_JSON';
         marionette('do stuff', {}, function() {});
+      });
+
+      teardown(function() {
+        console.error = c_error;
       });
 
       test('gracefully fallback to object', function() {
