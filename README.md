@@ -1,6 +1,8 @@
 marionette-js-runner
 ====================
 
+![Architecture diagram](http://i.imgur.com/VseTpDF.png)
+
 This project is the sum of a number of other smaller more focused projects:
   - [marionette-js-client](https://github.com/mozilla-b2g/marionette_js_client)
   - [marionette-profile-builder](https://github.com/mozilla-b2g/marionette-profile-builder)
