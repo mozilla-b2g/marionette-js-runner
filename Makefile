@@ -7,7 +7,7 @@ node_modules:
 	npm install
 
 .PHONY: test
-test: node_modules b2g test-unit test-integration
+test: node_modules b2g test-unit test-integration test-logger
 
 .PHONY: lint
 lint:
@@ -18,6 +18,10 @@ lint:
 .PHONY: test-integration
 test-integration:
 	./bin/marionette-mocha $(shell find test/integration) -t 100s
+
+.PHONY: test-logger
+test-logger:
+	./bin/marionette-mocha test/logger/console-proxy.js -t 100s --verbose
 
 .PHONY: test-unit
 test-unit:
