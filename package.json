@@ -1,6 +1,6 @@
 {
   "name": "marionette-js-runner",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "James Lal [:lightsofapollo]",
   "description": "Utility module for installing an app as preloaded & packaged app",
   "main": "index.js",
