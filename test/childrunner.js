@@ -286,8 +286,8 @@ suite('childrunner', function() {
 
       test('host should be given port as option', function() {
         assert.deepEqual(
-          restart.host.startOptions,
-          { port: restart.port }
+          restart.host.startOptions.port,
+          restart.port
         );
       });
 
