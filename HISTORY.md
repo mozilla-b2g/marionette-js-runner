@@ -1,3 +1,6 @@
+# 0.3.3
+  - kill b2g-desktop process when the child process dies
+
 # 0.2.0
   - marionette-mocha.opts
 
