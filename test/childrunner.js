@@ -63,7 +63,10 @@ suite('childrunner', function() {
     },
 
     stop: function(callback) {
-      process.nextTick(callback);
+      process.nextTick(function() {
+        this.stopped = true;
+        callback();
+      }.bind(this));
     }
   };
 
@@ -132,6 +135,21 @@ suite('childrunner', function() {
     test('emits end', function(done) {
       subject.runner.on('end', done);
     });
+
+    test('on process.exit', function(done) {
+      var callsCleanup = false;
+      subject.cleanup = function() {
+        callsCleanup = true;
+      };
+
+      subject.process.on('exit', function() {
+        assert.ok(!subject.process, 'removes .process reference');
+        assert.ok(callsCleanup, 'cleans up child');
+        done();
+      });
+
+      subject.process.kill();
+    });
   });
 
   suite('#profileOptions', function() {
@@ -172,7 +190,7 @@ suite('childrunner', function() {
 
       return function(err, meta) {
         // copy all of the remote properties
-        var remote = subject._remotes[meta.id];
+        var remote = subject.remotes[meta.id];
         for (var key in remote) {
           result[key] = remote[key];
         }
@@ -334,6 +352,41 @@ suite('childrunner', function() {
           done();
         });
       });
+    });
+
+    suite('#cleanup', function() {
+      var hosts;
+      // create host a
+      setup(function(done) {
+        subject.createHost({}, done);
+      });
+
+      // create host b
+      setup(function(done) {
+        subject.createHost({}, done);
+      });
+
+      // capture all the hosts
+      setup(function(done) {
+        hosts = [];
+        Object.keys(subject.remotes).forEach(function(id) {
+          hosts.push(subject.remotes[id].host);
+        });
+
+        // then clear them
+        subject.cleanup(done);
+      });
+
+      test('removes all remotes', function() {
+        assert.equal(Object.keys(subject.remotes), 0);
+      });
+
+      test('all remote hosts are stopped', function() {
+        hosts.forEach(function(host) {
+          assert.equal(host.stopped, true, 'host(s) have been stopped');
+        });
+      });
+
     });
 
   });
