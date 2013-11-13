@@ -1,6 +1,6 @@
 {
   "name": "marionette-js-runner",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "author": "James Lal [:lightsofapollo]",
   "description": "Utility module for installing an app as preloaded & packaged app",
   "main": "index.js",
@@ -30,7 +30,7 @@
   },
 
   "devDependencies": {
-    "marionette-client": ">=0.12.0-alpha",
+    "marionette-client": "~1.0.3",
     "mocha": "~1.12",
     "mozilla-download": "~0.2.1",
     "sinon": "~1.7"
