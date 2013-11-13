@@ -104,6 +104,8 @@ function main() {
     .option('--profile-base [json or js file]',
             'default profile options to use in all tests.')
     .option('--profile-builder [builder]', 'profile generation module')
+    .option('--script-timeout', 'marionette client script timeout')
+    .option('--search-timeout', 'marionette client search timeout (ie for findElement)')
 
     // The following arguments have been copied directly from from mocha.js. This
     // enables marionette-mocha to:
