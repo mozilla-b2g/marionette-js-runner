@@ -23,7 +23,8 @@
     "debug": "*",
     "empty-port": "~0.0.1",
     "intersect": "~0.0.3",
-    "marionette-b2gdesktop-host": "0.6.0",
+    "marionette-b2gdesktop-host":
+      "git://github.com/mozilla-b2g/marionette-b2gdesktop-host#master",
     "marionette-js-logger": "~0.1.0",
     "marionette-profile-builder": "0.0.2",
     "mocha-json-proxy": "~0.0.2"
