@@ -7,7 +7,7 @@ node_modules:
 	npm install
 
 .PHONY: test
-test: node_modules b2g test-unit test-integration test-logger
+test: node_modules b2g test-unit test-integration
 
 .PHONY: lint
 lint:
