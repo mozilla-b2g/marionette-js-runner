@@ -315,6 +315,17 @@ suite('childrunner', function() {
           restart.profileBuilder.mockPath
         );
       });
+
+      test('unknown remoteId should produce an error', function(done) {
+        subject.restartHost(
+          123,
+          overrides,
+          function(error) {
+            assert.ok(error);
+            done();
+          }
+        );
+      });
     });
 
     suite('#stopHost', function() {
@@ -351,6 +362,16 @@ suite('childrunner', function() {
           assert.ok(stopped, 'stops host');
           done();
         });
+      });
+
+      test('unknown remoteId should produce an error', function(done) {
+        subject.stopHost(
+          123,
+          function(error) {
+            assert.ok(error);
+            done();
+          }
+        );
       });
     });
 
