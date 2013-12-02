@@ -19,12 +19,8 @@ var OPTS_FILE = 'marionette-mocha.opts';
  *     and profileBase.
  */
 function getOpts() {
-  var Reporter;
-  try {
-    Reporter = require(program.reporter);
-  } catch (e) {
-    Reporter = require('mocha/lib/reporters/' + (program.reporter || 'dot'));
-  }
+  var reporterArg = program.reporter || 'Dot';
+  var Reporter = require('mocha').reporters[reporterArg];
 
   program.host = program.host || 'marionette-b2gdesktop-host';
   program.profileBuilder =
