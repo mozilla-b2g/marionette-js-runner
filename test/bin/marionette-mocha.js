@@ -43,8 +43,8 @@ suite('mocha integration', function() {
 
   var tests = [
     // this also tests picking up mocha.opts
-    ['test', ['--reporter', 'spec']],
-    ['pending', ['--reporter', 'spec']],
+    ['test', ['--reporter', 'Spec']],
+    ['pending', ['--reporter', 'Spec']],
     ['with-helper', ['--require', __dirname + '/../fixtures/helper.js']]
   ];
 
