@@ -83,7 +83,6 @@ function maybeApplyManifest() {
       argv = applyManifest(program.manifest, program.args, argv);
     } catch (err) {
       console.error(err);
-      process.exit(1);
     }
   }
 }
