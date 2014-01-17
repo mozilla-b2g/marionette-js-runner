@@ -1,6 +1,5 @@
 /**
- * @fileoverview A marionette test that logs something in gecko to
- *     exercise the marionette logger when --verbose is enabled in runner.
+ * @fileoverview A marionette test that simply logs something in gecko.
  */
 suite('console proxy', function() {
   var client = marionette.client();
