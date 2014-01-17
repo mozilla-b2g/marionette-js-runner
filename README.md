@@ -1,6 +1,9 @@
 marionette-js-runner
 ====================
 
+
+[![Build Status](https://travis-ci.org/mozilla-b2g/marionette-js-runner.png?branch=master)](https://travis-ci.org/mozilla-b2g/marionette-js-runner)
+
 ![Architecture diagram](http://i.imgur.com/VseTpDF.png)
 
 This project is the sum of a number of other smaller more focused projects:
