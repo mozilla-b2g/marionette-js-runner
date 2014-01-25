@@ -1,3 +1,6 @@
+# 0.4.2
+  - version bump for marionette-profile-builder
+
 # 0.3.3
   - kill b2g-desktop process when the child process dies
 
