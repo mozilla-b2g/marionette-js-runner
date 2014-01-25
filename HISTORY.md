@@ -1,3 +1,6 @@
+# 0.4.3
+  - fixing gjslint issues
+
 # 0.4.2
   - version bump for marionette-profile-builder
 
