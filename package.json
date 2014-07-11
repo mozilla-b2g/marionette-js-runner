@@ -1,6 +1,6 @@
 {
   "name": "marionette-js-runner",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "author": "James Lal [:lightsofapollo]",
   "description": "Utility module for installing an app as preloaded & packaged app",
   "main": "index.js",
@@ -24,7 +24,7 @@
     "empty-port": "~0.0.1",
     "intersect": "~0.0.3",
     "marionette-b2gdesktop-host": "0.8.1",
-    "marionette-js-logger": "0.1.2-non-native",
+    "marionette-js-logger": "0.1.4",
     "marionette-profile-builder": "0.0.3",
     "mocha-json-proxy": "~0.0.2"
   },
