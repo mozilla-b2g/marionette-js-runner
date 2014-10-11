@@ -209,7 +209,6 @@ suite('mocha integration', function() {
       });
 
     });
-
   });
 
 });
