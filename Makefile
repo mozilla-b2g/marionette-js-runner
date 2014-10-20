@@ -36,8 +36,8 @@ test-unit:
 		test/profilebuilder.js \
 		test/runtime.js \
 		test/runtime/*.js \
-		test/marionette.js \
-		test/bin/marionette-mocha.js
+		test/bin/marionette-mocha.js \
+		test/bin/sigint.js
 
 .PHONY: ci
 ci:
