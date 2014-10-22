@@ -30,14 +30,13 @@ test-logger:
 .PHONY: test-unit
 test-unit:
 	./node_modules/.bin/mocha -t 100s \
-		test/mocha/parentrunner.js \
 		test/childrunner.js \
+		test/parentrunner.js \
 		test/optsfileparser.js \
-		test/profilebuilder.js \
-		test/runtime.js \
 		test/runtime/*.js \
 		test/bin/marionette-mocha.js \
-		test/bin/sigint.js
+		test/bin/sigint.js \
+		test/bin/marionette-mocha.js
 
 .PHONY: ci
 ci:

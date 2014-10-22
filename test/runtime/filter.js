@@ -1,5 +1,5 @@
 suite('runtime/filterdata', function() {
-  var subject = require('../../lib/runtime/filterdata').FilterData;
+  var subject = require('../../lib/runtime/filter');
 
   suite('#validateArray', function() {
     test('is in array', function() {
