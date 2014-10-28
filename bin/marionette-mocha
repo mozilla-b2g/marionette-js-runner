@@ -153,6 +153,18 @@ function main() {
     })
     .options('mocha-flags', {
       desc: 'show mocha help and flags'
+    })
+    .options('--serial', {
+      desc: 'device serial ID to run tests against'
+    })
+    .options('--symbols-path', {
+      desc: 'symbols for the build'
+    })
+    .options('--b2gpath', {
+      desc: 'path to b2g directory for emulator builds'
+    })
+    .options('--buildapp', {
+      desc: 'type of build to run gaia-integration tests on, one of "emulator", "device", or "desktop"'
     });
 
   var argv = program.argv;
