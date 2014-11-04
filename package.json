@@ -28,7 +28,7 @@
     "yargs": "^1.3.2"
   },
   "devDependencies": {
-    "marionette-client": "~1.0.0",
+    "marionette-client": "~1.3.0",
     "mocha": "~1.21.4",
     "mozilla-download": "~0.2.1",
     "sinon": "~1.7"
