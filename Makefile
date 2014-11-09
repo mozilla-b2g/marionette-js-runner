@@ -34,9 +34,9 @@ test-unit:
 		test/parentrunner.js \
 		test/optsfileparser.js \
 		test/runtime/*.js \
-		test/bin/marionette-mocha.js \
 		test/bin/sigint.js \
-		test/bin/marionette-mocha.js
+		test/bin/marionette-mocha.js \
+		test/bin/apply-manifest.js
 
 .PHONY: ci
 ci:

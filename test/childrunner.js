@@ -83,8 +83,8 @@ suite('childrunner', function() {
   setup(function() {
     subject = new Child({
       argv: argv,
-      ProfileBuilder: ProfileBuilder,
-      Host: MockHost,
+      profileBuilder: { constructor: ProfileBuilder },
+      host: { constructor: MockHost },
       profileBase: profileBase
     });
   });
@@ -105,7 +105,7 @@ suite('childrunner', function() {
     });
 
     test('.Host', function() {
-      assert.equal(subject.Host, MockHost);
+      assert.equal(subject.host.constructor, MockHost);
     });
 
     test('.profileBase', function() {
@@ -113,7 +113,7 @@ suite('childrunner', function() {
     });
 
     test('.ProfileBuilder', function() {
-      assert.equal(subject.ProfileBuilder, ProfileBuilder);
+      assert.equal(subject.profileBuilder.constructor, ProfileBuilder);
     });
 
     test('.process', function() {

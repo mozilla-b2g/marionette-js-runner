@@ -12,9 +12,11 @@
     "integration"
   ],
   "bin": {
-    "marionette-mocha": "./bin/marionette-mocha"
+    "marionette-mocha": "./bin/marionette-mocha",
+    "apply-manifest": "./bin/apply-manifest"
   },
   "dependencies": {
+    "argparse": "^0.1.15",
     "array-difference": "0.0.1",
     "commander": "~1.3",
     "debug": "*",
