@@ -1,5 +1,6 @@
 suite('childrunner', function() {
   var sinon;
+  var PassThrough = require('stream').PassThrough;
 
   setup(function() {
     sinon = global.sinon.sandbox.create();
@@ -85,7 +86,8 @@ suite('childrunner', function() {
       argv: argv,
       profileBuilder: { constructor: ProfileBuilder },
       host: { constructor: MockHost },
-      profileBase: profileBase
+      profileBase: profileBase,
+      hostLog: new PassThrough()
     });
   });
 

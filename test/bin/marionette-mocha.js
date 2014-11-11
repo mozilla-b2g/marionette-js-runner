@@ -136,4 +136,64 @@ suite('mocha integration', function() {
       assert.equal(result.code, 66, JSON.stringify(result));
     });
   });
+
+  suite('--host-log=stdout', function() {
+    var result,
+    argv = [
+      '--host-log', 'stdout',
+      __dirname + '/fixtures/marionettetest'
+    ];
+
+    setup(function(done) {
+      var proc = spawnMarionette(argv);
+      result = waitForProcess(proc, done);
+    });
+
+    test('has marionette output', function() {
+      assert.ok(result.stdout.indexOf('newSession') !== -1);
+      assert.ok(result.stderr.indexOf('newSession') === -1);
+    });
+  });
+
+  suite('--host-log=stderr', function() {
+    var result,
+    argv = [
+      '--host-log', 'stderr',
+      __dirname + '/fixtures/marionettetest'
+    ];
+
+    setup(function(done) {
+      var proc = spawnMarionette(argv);
+      result = waitForProcess(proc, done);
+    });
+
+    test('has marionette output', function() {
+      assert.ok(result.stderr.indexOf('newSession') !== -1);
+      assert.ok(result.stdout.indexOf('newSession') !== 0);
+    });
+  });
+
+  suite('--host-log=<file>', function() {
+    var file = __dirname + '/log.txt';
+    var result,
+    argv = [
+      '--host-log', file,
+      __dirname + '/fixtures/marionettetest'
+    ];
+
+    setup(function(done) {
+      var proc = spawnMarionette(argv);
+      result = waitForProcess(proc, done);
+    });
+
+    teardown(function() {
+      fs.unlinkSync(file);
+    });
+
+    test('has marionette output', function() {
+      assert.ok(fs.existsSync(file));
+      assert.ok(fs.readFileSync(file, 'utf8').indexOf('newSession') !== -1);
+    });
+  });
+
 });
