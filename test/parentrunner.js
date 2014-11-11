@@ -47,9 +47,9 @@ suite('parentrunner', function() {
       sinon.stub(childrunner, 'ChildRunner', MockChild);
 
       result = subject.run({
-        Host: Host,
-        Reporter: Reporter,
-        ProfileBuilder: ProfileBuilder,
+        host: { constructor: Host },
+        reporter: { constructor: Reporter },
+        profileBuilder: { constructor: ProfileBuilder },
         profileBase: profileBase
       });
     });
@@ -75,8 +75,8 @@ suite('parentrunner', function() {
       test('options', function() {
         var expected = {
           argv: subject.argv,
-          Host: Host,
-          ProfileBuilder: ProfileBuilder,
+          host: { constructor: Host },
+          profileBuilder: { constructor: ProfileBuilder },
           profileBase: profileBase,
           verbose: undefined,
           runtime: undefined

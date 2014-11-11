@@ -8,12 +8,12 @@ suite('mocha integration', function() {
       stdout: ''
     };
 
-    childProcess.stderr.on('data', function(input) {
-      result.stderr += input.toString();
+    childProcess.stderr.on('data', function(out) {
+      result.stderr += out;
     });
 
-    childProcess.stdout.on('data', function(input) {
-      result.stdout += input.toString();
+    childProcess.stdout.on('data', function(out) {
+      result.stdout += out;
     });
 
     return result;
@@ -29,6 +29,7 @@ suite('mocha integration', function() {
       // bugs but prevent us from verifying real content so they are stripped.
       ['stderr', 'stdout'].forEach(function(field) {
         [MS_REGEXP, NEW_LINES].forEach(function(regex) {
+          result[field + 'Raw'] = result[field];
           result[field] = result[field].replace(regex, '').trim();
         });
       });
@@ -85,20 +86,38 @@ suite('mocha integration', function() {
   });
 
   suite('--host', function() {
-    var result,
-        argv = [
-          '--host', __dirname + '/fixtures/host',
-          __dirname + '/fixtures/marionettetest'
-        ];
+    var result;
+    var argv = ['--host', __dirname + '/fixtures/host'];
+    var Host = require('./fixtures/host');
 
-    setup(function(done) {
-      var proc = spawnMarionette(argv);
-      result = waitForProcess(proc, done);
+    suite('when passing --help', function() {
+      setup(function(done) {
+        var proc = spawnMarionette(argv.concat(['--help']));
+        result = waitForProcess(proc, done);
+      });
+
+      test('custom help is shown', function() {
+        assert.ok(result.stdoutRaw.indexOf(Host.help.group.title) !== -1);
+        assert.ok(result.stdoutRaw.indexOf(Host.help.group.description) !== -1);
+        assert.ok(result.stdoutRaw.indexOf('--code') !== -1);
+      });
     });
 
-    test('exits with magic code', function() {
-      assert.equal(result.code, 55, JSON.stringify(result));
+    suite('run a test', function() {
+      setup(function(done) {
+        var proc = spawnMarionette(argv.concat([
+          __dirname + '/fixtures/marionettetest',
+          '--code',
+          '55'
+        ]));
+        result = waitForProcess(proc, done);
+      });
+
+      test('exits with magic code', function() {
+        assert.equal(result.code, 55, JSON.stringify(result));
+      });
     });
+
   });
 
   suite('--profile-builder', function() {
@@ -117,96 +136,4 @@ suite('mocha integration', function() {
       assert.equal(result.code, 66, JSON.stringify(result));
     });
   });
-
-  suite('--manifest', function() {
-
-    test('exits with status code 1 when file is not found', function(done) {
-      var filename = 'non-existent-file.json';
-      var argv = ['--manifest', filename];
-      var proc = spawnMarionette(argv);
-
-      // Ensure that dummy file does not actually exist
-      assert.ok(!fs.existsSync(filename));
-
-      result = waitForProcess(proc, function() {
-        assert.equal(result.code, 1);
-        done();
-      });
-    });
-
-    test('exits with status code 1 when file is not JSON-formatted',
-      function(done) {
-      var argv = ['--manifest', __filename];
-      var proc = spawnMarionette(argv);
-      result = waitForProcess(proc, function() {
-        assert.equal(result.code, 1);
-        done();
-      });
-    });
-
-    suite('absolute paths', function() {
-
-      test('blacklisted files', function(done) {
-        var argv = [
-          '--manifest',
-          path.join(__dirname, 'fixtures', 'manifest-blacklist.json'),
-          path.join(__dirname, 'fixtures', 'manifest-test-skip.js'),
-          path.join(__dirname, 'fixtures', 'manifest-test-use.js')
-        ];
-        var proc = spawnMarionette(argv);
-        result = waitForProcess(proc, function() {
-          assert.equal(result.code, 23);
-          done();
-        });
-      });
-
-      test('whitelisted files', function(done) {
-        var argv = [
-          '--manifest',
-          path.join(__dirname, 'fixtures', 'manifest-whitelist.json'),
-          path.join(__dirname, 'fixtures', 'manifest-test-skip.js'),
-          path.join(__dirname, 'fixtures', 'manifest-test-use.js')
-        ];
-        var proc = spawnMarionette(argv);
-        result = waitForProcess(proc, function() {
-          assert.equal(result.code, 23);
-          done();
-        });
-      });
-
-    });
-
-    suite('relative paths', function() {
-
-      test('blacklisted files', function(done) {
-        var argv = [
-          '--manifest',
-          path.join(__dirname, 'fixtures', 'manifest-blacklist.json'),
-          path.join('test', 'bin', 'fixtures', 'manifest-test-skip.js'),
-          path.join('test', 'bin', 'fixtures', 'manifest-test-use.js')
-        ];
-        var proc = spawnMarionette(argv);
-        result = waitForProcess(proc, function() {
-          assert.equal(result.code, 23);
-          done();
-        });
-      });
-
-      test('whitelisted files', function(done) {
-        var argv = [
-          '--manifest',
-          path.join('test', 'bin', 'fixtures', 'manifest-whitelist.json'),
-          path.join('test', 'bin', 'fixtures', 'manifest-test-skip.js'),
-          path.join('test', 'bin', 'fixtures', 'manifest-test-use.js')
-        ];
-        var proc = spawnMarionette(argv);
-        result = waitForProcess(proc, function() {
-          assert.equal(result.code, 23);
-          done();
-        });
-      });
-
-    });
-  });
-
 });
