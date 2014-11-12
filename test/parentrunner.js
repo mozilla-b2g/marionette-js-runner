@@ -1,4 +1,5 @@
 suite('parentrunner', function() {
+  var PassThrough = require('stream').PassThrough;
 
   var sinon;
   setup(function() {
@@ -50,7 +51,8 @@ suite('parentrunner', function() {
         host: { constructor: Host },
         reporter: { constructor: Reporter },
         profileBuilder: { constructor: ProfileBuilder },
-        profileBase: profileBase
+        profileBase: profileBase,
+        hostLog: new PassThrough()
       });
     });
 
@@ -64,25 +66,6 @@ suite('parentrunner', function() {
 
     test('spawns child', function() {
       assert.ok(subject.children[0].calledSpawn);
-    });
-
-    suite('child', function() {
-      var child;
-      setup(function() {
-        child = subject.children[0];
-      });
-
-      test('options', function() {
-        var expected = {
-          argv: subject.argv,
-          host: { constructor: Host },
-          profileBuilder: { constructor: ProfileBuilder },
-          profileBase: profileBase,
-          verbose: undefined,
-          runtime: undefined
-        };
-        assert.deepEqual(child.options, expected);
-      });
     });
   });
 

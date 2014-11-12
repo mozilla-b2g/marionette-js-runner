@@ -31,6 +31,21 @@ function requireReporter(path) {
   }
 }
 
+/**
+Convert this host log argument into a stream (not done as a type to avoid
+destructive operations when calling --help)
+*/
+function hostLogStream(value) {
+  switch (value) {
+    case 'stderr':
+      return process.stderr;
+    case 'stdout':
+      return process.stdout;
+    default:
+      return fs.createWriteStream(value);
+  }
+}
+
 var parser = new ArgumentParser({
   version: require('../package').version,
   description: 'Marionette JS Runner',
@@ -78,6 +93,13 @@ parser.addArgument(['--profile-builder'], {
   help: 'profile generation module',
   dest: 'profileBuilder',
   defaultValue: 'marionette-profile-builder'
+});
+
+parser.addArgument(['--host-log'], {
+  type: 'string',
+  help: 'Location for gecko/host logs (<file>, stderr, stdout)',
+  dest: 'hostLog',
+  defaultValue: 'marionette-mocha-gecko.log'
 });
 
 parser.addArgument(['--mocha-flags'], {
@@ -169,6 +191,8 @@ function main(argv) {
     },
 
     profileBase: args[0].profileBase,
+
+    hostLog: hostLogStream(args[0].hostLog),
 
     verbose: args[0].verbose
   });
