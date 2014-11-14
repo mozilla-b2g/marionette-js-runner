@@ -8,7 +8,7 @@ suite('SIGINT', function() {
   }
 
   // Pretty much what you would expect out of a ps parser.
-  function ps(pid, callback) {
+  function ps(callback) {
     // ppid is important here for the intent of this test but aside from the
     // flags this code is actually could be general purpose.
     exec('ps -o comm -o pid -o ppid', function(err, stdout) {
@@ -33,7 +33,7 @@ suite('SIGINT', function() {
 
   // Find all processes which share a starting process parent.
   function recursivePpidSearch(pid, callback) {
-    ps(pid, function(err, list) {
+    ps(function(err, list) {
       if (err) return callback(err);
 
       var result = [];
@@ -80,9 +80,18 @@ suite('SIGINT', function() {
   test('closes cleanly on sigint with no left over processes', function(done) {
     proc.kill('SIGINT');
     proc.once('exit', function(code) {
-      recursivePpidSearch(pid, function(err, list) {
+      ps(function(err, currentProcesses) {
         if (err) return done(err);
-        assert.ok(!list.length, 'all processes have been shut down');
+        var remaining = processList.filter(function(startProc) {
+          for (var i = 0; i < currentProcesses.length; i++) {
+            if (currentProcesses[i].pid == startProc.pid) return true;
+          }
+          return false
+        });
+        assert(
+          !remaining.length,
+          'Process still running: ' + JSON.stringify(remaining)
+        );
         done();
       });
     });
