@@ -137,21 +137,6 @@ suite('childrunner', function() {
     test('emits end', function(done) {
       subject.runner.on('end', done);
     });
-
-    test('on process.exit', function(done) {
-      var callsCleanup = false;
-      subject.cleanup = function() {
-        callsCleanup = true;
-      };
-
-      subject.process.on('exit', function() {
-        assert.ok(!subject.process, 'removes .process reference');
-        assert.ok(callsCleanup, 'cleans up child');
-        done();
-      });
-
-      subject.process.kill();
-    });
   });
 
   suite('#profileOptions', function() {
