@@ -1,6 +1,6 @@
 suite('mocha integration', function() {
   var fs = require('fs');
-  var path = require('path');
+  var fsPath = require('path');
 
   function aggregateOutput(childProcess) {
     var result = {
@@ -46,12 +46,16 @@ suite('mocha integration', function() {
     // this also tests picking up mocha.opts
     ['test', ['--reporter', 'spec']],
     ['pending', ['--reporter', 'spec']],
-    ['with-helper', ['--require', __dirname + '/../fixtures/helper.js']]
+    ['with-helper', [
+        '--require', fsPath.resolve(__dirname + '/../fixtures/helper.js'),
+        '--reporter', 'spec'
+      ]
+    ]
   ];
 
   tests.forEach(function(pair) {
     var file = pair[0];
-    var path = __dirname + '/fixtures/' + file;
+    var path = fsPath.resolve(__dirname + '/../fixtures/' + file);
 
     var argv = [path].concat(pair[1]);
 
@@ -72,7 +76,9 @@ suite('mocha integration', function() {
       });
 
       test('code', function() {
-        assert.equal(mochaOut.code, marionetteOut.code);
+        assert.equal(
+          JSON.stringify(mochaOut.code), JSON.stringify(marionetteOut.code)
+        );
       });
 
       test('stdout', function() {
