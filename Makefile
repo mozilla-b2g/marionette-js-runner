@@ -17,11 +17,11 @@ test: node_modules b2g test-unit test-integration
 lint:
 	gjslint --recurse . \
 		--disable "220,225" \
-		--exclude_directories "examples,node_modules,b2g,api-design"
+		--exclude_directories "examples,node_modules,b2g,api-design,host"
 
 .PHONY: test-integration
 test-integration:
-	./bin/marionette-mocha $(shell find test/integration) -t 100s
+	./bin/marionette-mocha --host-log stdout $(shell find test/integration) -t 100s
 
 .PHONY: test-logger
 test-logger:
@@ -37,8 +37,3 @@ test-unit:
 		test/bin/sigint.js \
 		test/bin/marionette-mocha.js \
 		test/bin/apply-manifest.js
-
-.PHONY: ci
-ci:
-	Xvfb :99 &
-	DISPLAY=:99 make
