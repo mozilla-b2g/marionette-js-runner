@@ -7,8 +7,8 @@ import sys
 import os
 import json
 import uuid
-
 import BaseHTTPServer
+import traceback
 
 from .handlers import runner_handlers
 
@@ -58,7 +58,10 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 func = getattr(self, method)
                 result = func(payload)
             except Exception as e:
-                self.send_json(500, { 'message': str(e) })
+                self.send_json(500, {
+                    'message': str(e),
+                    'stack': traceback.format_exc()
+                })
             else:
                 self.send_json(200, result)
         else:
@@ -73,6 +76,13 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_test_status(self, data):
         print 'TEST-STATUS | %s | %s' % (data['subtest'], data['status'])
+
+    def do_connect(self, payload):
+        '''
+        Simple connection ready hook to signal socket readiness...
+        '''
+        return {}
+
 
     def do_start_runner(self, payload):
         '''
