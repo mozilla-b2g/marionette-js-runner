@@ -4,6 +4,12 @@ var Promise = require('promise');
 var rpc = new RPC(process.send.bind(process));
 
 rpc.register('test', {
+  $rpc: { methods: ['args'] },
+
+  getSelf: function() {
+    return Promise.resolve(this);
+  },
+
   noArgs: function() {
     return Promise.resolve();
   },

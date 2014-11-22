@@ -15,7 +15,7 @@ suite('rpc', function() {
   var subject, client;
   setup(function() {
     subject = new RPC(proc.send.bind(proc));
-    client = subject.client('test', ['noArgs', 'args', 'error']);
+    client = subject.client('test', ['noArgs', 'args', 'error', 'getSelf']);
     proc.on('message', subject.handle());
   });
 
@@ -26,6 +26,14 @@ suite('rpc', function() {
   test('args', function() {
     return client.args(1, 2, 3, 4).then(function(result) {
       assert.deepEqual(result, [1, 2, 3, 4]);
+    });
+  });
+
+  test('objects', function() {
+    return client.getSelf().then(function(rpcObj) {
+      return rpcObj.args('woot', 'bar')
+    }).then(function(value) {
+      assert.deepEqual(value, ['woot', 'bar']);
     });
   });
 
