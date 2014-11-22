@@ -1,17 +1,19 @@
 'use strict';
 
 var fsPath = require('path'),
-    fs = require('fs'),
     spawn = require('child_process').spawn,
     debug = require('debug')('marionette-socket-host:events');
 
 var uuid = require('uuid');
 var waitForEvent = require('./lib/wait_for_event');
 var request = require('./lib/request');
+var fs = require('mz/fs');
 
 var PassThrough = require('stream').PassThrough;
 var EventEmitter = require('events').EventEmitter;
 var Promise = require('promise');
+
+var mkdirp = Promise.denodeify(require('mkdirp'));
 
 var detectBinary =
   Promise.denodeify(require('mozilla-runner/lib/detectbinary').detectBinary);
@@ -60,6 +62,18 @@ function resolveBinary(options) {
 }
 
 /**
+Creates crash watcher (a simple file system change watcher).
+
+@param {Object} options (as described in .help)
+*/
+function createCrashWatch(options) {
+  return mkdirp(options.dump_path).
+    then(function() {
+      return fs.watch(options.dump_path)
+    });
+}
+
+/**
  * Host interface for marionette-js-runner.
  *
  * @constructor
@@ -73,8 +87,9 @@ function Host(options) {
   this.options = options || {};
   this.process = null;
   this.socketPath = null;
-  this.events = null;
   this.id = null;
+
+  EventEmitter.call(this);
 }
 
 /**
@@ -127,7 +142,7 @@ Host.help = {
 
     '--dump-path': {
       dest: 'dump_path',
-      defaultValue: null,
+      defaultValue: process.cwd() + '/crash',
       help: 'path in which to store crash dumps. Will default to ' +
             "the 'minidumps' directory in the current working directory"
     },
@@ -140,6 +155,8 @@ Host.help = {
 };
 
 Host.prototype = {
+  __proto__: EventEmitter.prototype,
+
   /**
    * Starts the device/b2g-desktop process.
    *
@@ -161,11 +178,11 @@ Host.prototype = {
 
       if (startOptions.b2g_home && startOptions.buildapp === 'desktop') {
         throw new Error(
-          'Can only specify --b2gpath with a device or emulator buildapp.'
+          ''
         );
       }
 
-      if (!startOptions.b2g_home && startOptions.buildapp === 'emulator') {
+      if () {
         throw new Error(
           'Can only specify --b2gpath with a device or emulator buildapp.'
         );
@@ -205,9 +222,14 @@ Host.prototype = {
       pythonChild.stderr.on('data', log.write.bind(log));
 
       var socketEvents;
+      var binary;
       var start = Date.now();
       resolveBinary(startOptions)
-        .then(function onBinary(binary) {
+        .then(function(_binary) {
+          binary = _binary;
+          return createCrashWatch(startOptions);
+        })
+        .then(function onBinary() {
           return request(this.socketPath, '/start_runner', {
             binary: binary,
             options: startOptions
@@ -225,7 +247,10 @@ Host.prototype = {
         // pass any success status upstream.
         .then(accept)
         // or any errors this promise chain encounters.
-        .catch (reject);
+        .catch (function(e) {
+          this.stopCrashWatch();
+          reject(e);
+        }.bind(this));
     }.bind(this));
 
     return this._startInProgress;
@@ -254,7 +279,8 @@ Host.prototype = {
         return waitForEvent(this.process, 'exit');
       }.bind(this))
       .then(function afterProcessEnd() {
-        this._stopInProgress = this.events = this.socket = this.process = null;
+        this._stopInProgress = this.socket = this.process = null;
+        this.stopCrashWatch();
       }.bind(this));
 
     return this._stopInProgress;
