@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 var ArgumentParser = require('argparse').ArgumentParser;
-var Parent = require('../lib/parentrunner').ParentRunner;
+var Runner = require('../lib/childrunner').ChildRunner;
 
 var assert = require('assert');
 var fs = require('fs');
@@ -166,15 +166,8 @@ function main(argv) {
     process.exit(0);
   }
 
-  var mochaArgs = args[1].slice(2);
-
-  // ui is required but only used by the child process...
-  mochaArgs.push('--ui');
-  mochaArgs.push(args[0].ui);
-
   // Options to pass on to mocha...
-  var runner = new Parent(mochaArgs);
-  runner.run({
+  var runner = new Runner({
     host: {
       module: args[0].host,
       options: extractOptionsFromModule(args[0], hostActions)
@@ -196,6 +189,16 @@ function main(argv) {
 
     verbose: args[0].verbose
   });
+
+  var mochaArgs = args[1].slice(2);
+
+  // ui is required but only used by the child process...
+  mochaArgs.push('--ui');
+  mochaArgs.push(args[0].ui);
+
+  runner.spawn(mochaArgs);
+
+  var reporter = new args[0].reporter(runner.mochaRunnerProxy);
 
   runner.process.stdout.pipe(process.stdout);
   runner.process.stderr.pipe(process.stderr);
