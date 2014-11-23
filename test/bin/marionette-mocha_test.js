@@ -1,11 +1,12 @@
 suite('mocha integration', function() {
+  this.timeout('30s');
   var fs = require('fs');
   var fsPath = require('path');
 
   function aggregateOutput(childProcess) {
     var result = {
       stderr: '',
-      stdout: ''
+      stdout: '',
     };
 
     childProcess.stderr.on('data', function(out) {

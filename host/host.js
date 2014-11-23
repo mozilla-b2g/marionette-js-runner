@@ -36,9 +36,10 @@ function spawnVirtualEnv(bin, argv, opts) {
 }
 
 
-function Host(socketPath, process) {
+function Host(socketPath, process, log) {
   this.process = process;
   this.socketPath = socketPath;
+  this.log = log;
   this.sessions = {};
   this.pendingSessions = [];
 
@@ -85,7 +86,7 @@ Host.create = function() {
 
     var pythonChild = spawnVirtualEnv('gaia-integration',
       ['--path=' + socketPath],
-      { stdio: 'inherit' }
+      { stdio: [0, 1, 2, 'pipe'] }
     );
 
     // Until we get ready start any errors will trigger the callback.
@@ -106,7 +107,7 @@ Host.create = function() {
         pythonChild.removeListener('exit', earlyExitHandler);
         pythonChild.removeListener('error', reject);
 
-        return new Host(socketPath, pythonChild);
+        return new Host(socketPath, pythonChild, pythonChild.stdio[3]);
       })
       .then(accept)
       .catch(reject);
