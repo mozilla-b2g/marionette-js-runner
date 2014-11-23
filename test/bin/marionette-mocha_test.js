@@ -6,7 +6,7 @@ suite('mocha integration', function() {
   function aggregateOutput(childProcess) {
     var result = {
       stderr: '',
-      stdout: '',
+      stdout: ''
     };
 
     childProcess.stderr.on('data', function(out) {

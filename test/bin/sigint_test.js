@@ -60,8 +60,8 @@ suite('SIGINT', function() {
         // Usual process spawning stuff the important bit here is this fixture will
         // fail and never complete unless we wait for 100s or kill the process.
         proc = spawnMarionette([testFile]);
-        proc.stdout.pipe(process.stdout)
-        proc.stderr.pipe(process.stderr)
+        proc.stdout.pipe(process.stdout);
+        proc.stderr.pipe(process.stderr);
         pid = proc.pid;
 
         // Wait for all the created processes to finish cleanly
@@ -90,7 +90,7 @@ suite('SIGINT', function() {
               for (var i = 0; i < currentProcesses.length; i++) {
                 if (currentProcesses[i].pid == startProc.pid) return true;
               }
-              return false
+              return false;
             });
             assert(
               !remaining.length,

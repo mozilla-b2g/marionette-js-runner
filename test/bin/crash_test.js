@@ -12,7 +12,7 @@ suite('Crash handling', function() {
       if (buffer.toString().indexOf('Crash detected ') !== -1) {
         hasCrash = true;
       }
-    })
+    });
 
     proc.once('exit', function(code) {
       assert(hasCrash, 'has crash message');

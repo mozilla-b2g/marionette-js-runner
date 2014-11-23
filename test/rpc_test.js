@@ -33,7 +33,7 @@ suite('rpc', function() {
     var obj;
     return client.getSelf().then(function(rpcObj) {
       obj = rpcObj;
-      return rpcObj.args('woot', 'bar')
+      return rpcObj.args('woot', 'bar');
     }).then(function(value) {
       assert.deepEqual(value, ['woot', 'bar']);
     }).then(function() {
@@ -56,7 +56,7 @@ suite('rpc', function() {
           throw new Error('must not resolve');
         });
       })
-      .catch(function(err) {
+      .catch (function(err) {
         assert.equal(err.message, 'xfoo');
       });
   });

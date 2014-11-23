@@ -25,7 +25,7 @@ rpc.register('test', {
     return new Promise(function() {
       throw new Error('xfoo');
     });
-  },
+  }
 });
 
 var handle = rpc.handle();
