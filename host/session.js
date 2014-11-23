@@ -3,6 +3,8 @@
 var assert = require('assert');
 var assign = require('object-assign');
 var fsPath = require('path');
+var util = require('util');
+var indent = require('indent-string');
 
 var Promise = require('promise');
 
@@ -33,7 +35,44 @@ function Session(host, id, options) {
 }
 
 Session.prototype = {
-  $rpc: { methods: ['destroy'] },
+  $rpc: { methods: ['destroy', 'checkError'] },
+
+  checkError: function(profileConfig, err) {
+    var request = {
+      // TODO: This does not work for devices as is...
+      dump_directory: profileConfig.profile + '/minidumps',
+      symbols_path: this.options.symbols_path,
+      dump_save_path: this.options.dump_path
+    };
+
+    var start = Date.now();
+    return this.host.request('/get_crash_info', request).
+      then(function(result) {
+        // If for some reason stackwalk implodes then show some useful output.
+        if (result.stackwalk_retcode !== 0) {
+          var msg = 'Crash detected but error running stackwalk\n';
+          result.stackwalk_errors.forEach(function(str) {
+            msg += indent(str, ' ', 2) + '\n';
+          });
+
+          var error = new Error(msg);
+          error.name = 'ProcessCrash';
+
+          error.stack =
+            msg +
+            '\n' +
+            indent((result.stackwalk_stderr || ''), ' ', 4);
+
+          throw error;
+        }
+
+        var msg = util.format('Crash detected at: %s', result.signature);
+        var error = new Error(msg);
+        error.stack = msg + '\n' + result.stackwalk_stdout;
+        error.name = 'ProcessCrash Stackwalk';
+        return error;
+      });
+  },
 
   destroy: function() {
     var payload = { id: this.id };

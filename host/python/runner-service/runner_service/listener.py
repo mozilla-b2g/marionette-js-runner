@@ -9,6 +9,7 @@ import json
 import uuid
 import BaseHTTPServer
 import traceback
+import mozcrash
 
 from .handlers import runner_handlers
 
@@ -83,6 +84,21 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         '''
         return {}
 
+    def do_get_crash_info(self, payload):
+        # Somewhat terrible (maybe) hack to get CrashInfo private interface.
+        crash_info = mozcrash.mozcrash.CrashInfo(**payload)
+
+        # Return first error or nothing...
+        for info in crash_info:
+            return {
+                'signature': info.signature,
+                'stackwalk_stdout': info.stackwalk_stdout,
+                'stackwalk_stderr': info.stackwalk_stderr,
+                'stackwalk_retcode': info.stackwalk_retcode,
+                'stackwalk_errors': info.stackwalk_errors
+            }
+
+        return {}
 
     def do_start_runner(self, payload):
         '''

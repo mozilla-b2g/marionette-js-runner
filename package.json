@@ -22,6 +22,7 @@
     "debug": "*",
     "empty-port": "~0.0.1",
     "escape-string-regexp": "^1.0.2",
+    "indent-string": "^1.2.0",
     "intersect": "~0.0.3",
     "marionette-js-logger": "0.1.4",
     "marionette-profile-builder": "0.0.3",

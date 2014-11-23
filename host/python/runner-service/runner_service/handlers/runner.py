@@ -50,8 +50,7 @@ class MozrunnerHandler(object):
         pass
 
     def on_finish(self):
-        if self.runner:
-            self.runner.check_for_crashes()
+        pass
 
     def cleanup(self):
         if self.runner:
