@@ -38,6 +38,7 @@ Session.prototype = {
   destroy: function() {
     var payload = { id: this.id };
     return this.host.request('/stop_runner', payload).then(function() {
+      delete this.host.sessions[this.id];
       this.id = null;
     }.bind(this));
   }
@@ -45,7 +46,7 @@ Session.prototype = {
 
 
 Session.create = function(host, profile, options) {
-  return Promise.resolve().then(function() {
+  var promise = Promise.resolve().then(function() {
     // shallow clone options...
     options = assign(
       // default options...
@@ -72,9 +73,14 @@ Session.create = function(host, profile, options) {
         options: options
       });
     }).then(function(result) {
-      return new Session(host, result.id, options);
+      var session = new Session(host, result.id, options);
+      host.sessions[result.id] = session;
+      host.pendingSessions.splice(host.pendingSessions.indexOf(promise), 1);
+      return session;
     });
   });
+  host.pendingSessions.push(promise);
+  return promise;
 };
 
 module.exports = Session;

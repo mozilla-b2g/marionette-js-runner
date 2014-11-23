@@ -3,6 +3,7 @@
 var spawn = require('child_process').spawn;
 var uuid = require('uuid');
 var request = require('./lib/request');
+var assert = require('assert');
 
 var EventEmitter = require('events').EventEmitter;
 var Promise = require('promise');
@@ -38,6 +39,8 @@ function spawnVirtualEnv(bin, argv, opts) {
 function Host(socketPath, process) {
   this.process = process;
   this.socketPath = socketPath;
+  this.sessions = {};
+  this.pendingSessions = [];
 
   EventEmitter.call(this);
 }
@@ -46,9 +49,25 @@ Host.prototype = {
   __proto__: EventEmitter.prototype,
 
   destroy: function() {
-    return new Promise(function(accept, reject) {
-      this.process.kill();
-      this.process.once('exit', accept);
+    // If there are any pending session creates wait for those to cleanly finish
+    // first.
+    if (this.pendingSessions.length) {
+      return Promise.all(this.pendingSessions).then(this.destroy.bind(this));
+    }
+
+    var sessions = Object.keys(this.sessions).map(function(id) {
+      return this.sessions[id].destroy();
+    }, this);
+
+    return Promise.all(sessions).then(function() {
+      return new Promise(function(accept) {
+        assert(
+          Object.keys(this.sessions).length === 0,
+          'all sessions removed.'
+        );
+        this.process.kill();
+        this.process.once('exit', accept);
+      }.bind(this));
     }.bind(this));
   },
 

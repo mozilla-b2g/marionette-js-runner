@@ -53,50 +53,63 @@ suite('SIGINT', function() {
     });
   }
 
-  var proc, processList, pid;
-  setup(function(done) {
-    // Usual process spawning stuff the important bit here is this fixture will
-    // fail and never complete unless we wait for 100s or kill the process.
-    proc = spawnMarionette([__dirname + '/fixtures/blocked.js']);
-    proc.stdout.pipe(process.stdout)
-    proc.stderr.pipe(process.stderr)
-    pid = proc.pid;
+  function ensureKill(testFile, waitTime) {
+    suite('SIGKILL ' + testFile + ' after ' + waitTime + ' ms', function() {
+      var proc, processList, pid;
+      setup(function(done) {
+        // Usual process spawning stuff the important bit here is this fixture will
+        // fail and never complete unless we wait for 100s or kill the process.
+        proc = spawnMarionette([testFile]);
+        proc.stdout.pipe(process.stdout)
+        proc.stderr.pipe(process.stderr)
+        pid = proc.pid;
 
-    // Wait for all the created processes to finish cleanly
-    // - b2g process
-    // - child _mocha process
-    // - proxy reporter process
-    var processes = 3;
+        // Wait for all the created processes to finish cleanly
+        // - b2g process
+        // - child _mocha process
+        // - proxy reporter process
+        var processes = 3;
 
-    function search() {
-      recursivePpidSearch(process.pid, function(err, list) {
-        if (err) return done(err);
-        if (list.length < processes) return setTimeout(search);
-        processList = list;
-        done();
+        function search() {
+          recursivePpidSearch(process.pid, function(err, list) {
+            if (err) return done(err);
+            if (list.length < processes) return setTimeout(search);
+            processList = list;
+            setTimeout(done, waitTime);
+          });
+        }
+        search();
       });
-    }
-    search();
-  });
 
-  test('closes cleanly on sigint with no left over processes', function(done) {
-    proc.kill('SIGINT');
-    proc.once('exit', function(code) {
-      ps(function(err, currentProcesses) {
-        if (err) return done(err);
-        var remaining = processList.filter(function(startProc) {
-          for (var i = 0; i < currentProcesses.length; i++) {
-            if (currentProcesses[i].pid == startProc.pid) return true;
-          }
-          return false
+      test('cleanly sigkill with no leftovers', function(done) {
+        proc.kill('SIGINT');
+        proc.once('exit', function(code) {
+          ps(function(err, currentProcesses) {
+            if (err) return done(err);
+            var remaining = processList.filter(function(startProc) {
+              for (var i = 0; i < currentProcesses.length; i++) {
+                if (currentProcesses[i].pid == startProc.pid) return true;
+              }
+              return false
+            });
+            assert(
+              !remaining.length,
+              'Process still running: ' + JSON.stringify(remaining)
+            );
+            done();
+          });
         });
-        assert(
-          !remaining.length,
-          'Process still running: ' + JSON.stringify(remaining)
-        );
-        done();
       });
     });
-  });
+  }
+
+  // Basically instantly.
+  ensureKill(__dirname + '/../integration/multiclient_test', 10);
+  // Very early in the startup.
+  ensureKill(__dirname + '/../integration/multiclient_test', 100);
+  // Sessions are probably being created.
+  ensureKill(__dirname + '/../integration/multiclient_test', 500);
+  // Marionette is blocked.
+  ensureKill(__dirname + '/fixtures/blocked', 500);
 });
 

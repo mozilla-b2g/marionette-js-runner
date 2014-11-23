@@ -203,6 +203,18 @@ function main(argv) {
   runner.process.stdout.pipe(process.stdout);
   runner.process.stderr.pipe(process.stderr);
   runner.process.on('exit', process.exit);
+
+  process.once('SIGINT', function() {
+    // Let the child die whenever but we need to cleanup hosts in this
+    // process...
+    runner.process.removeListener('exit', process.exit);
+    runner.destroy().catch(function(e) {
+      process.nextTick(function() {
+        // Throw any errors we can't deal with in the course of normal destroy.
+        throw e;
+      });
+    });
+  });
 }
 
 if (require.main === module) {
