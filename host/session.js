@@ -33,6 +33,8 @@ function Session(host, id, options) {
 }
 
 Session.prototype = {
+  $rpc: { methods: ['destroy'] },
+
   destroy: function() {
     var payload = { id: this.id };
     return this.host.request('/stop_runner', payload).then(function() {
