@@ -67,7 +67,7 @@ parser.addArgument(['--ui'], {
 parser.addArgument(['--host'], {
   type: require,
   help: 'host module to use defaults to marionette-b2gdesktop-host',
-  defaultValue: __dirname + '/../host/v2'
+  defaultValue: __dirname + '/../host'
 });
 
 parser.addArgument(['--reporter'], {
