@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 var ArgumentParser = require('argparse').ArgumentParser;
-var Runner = require('../lib/childrunner').ChildRunner;
+var Runner = require('../lib/runner');
 
 var assert = require('assert');
 var fs = require('fs');
