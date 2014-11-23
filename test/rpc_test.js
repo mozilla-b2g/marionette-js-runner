@@ -30,11 +30,23 @@ suite('rpc', function() {
   });
 
   test('objects', function() {
+    var obj;
     return client.getSelf().then(function(rpcObj) {
+      obj = rpcObj;
       return rpcObj.args('woot', 'bar')
     }).then(function(value) {
       assert.deepEqual(value, ['woot', 'bar']);
-    });
+    }).then(function() {
+      assert(obj.destroy, 'has implicit destroy method');
+      return obj.destroy();
+    }).then(function() {
+      return obj.args();
+    }).then(
+      function() { throw new Error('expected error'); },
+      function(err) {
+        assert.ok(err.message.indexOf('destroyed') !== -1);
+      }
+    );
   });
 
   test('error', function() {
