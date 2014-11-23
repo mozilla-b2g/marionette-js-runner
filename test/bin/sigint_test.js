@@ -57,8 +57,9 @@ suite('SIGINT', function() {
     suite('SIGKILL ' + testFile + ' after ' + waitTime + ' ms', function() {
       var proc, processList, pid;
       setup(function(done) {
-        // Usual process spawning stuff the important bit here is this fixture will
-        // fail and never complete unless we wait for 100s or kill the process.
+        // Usual process spawning stuff the important bit here is this fixture
+        // will fail and never complete unless we wait for 100s or kill the
+        // process.
         proc = spawnMarionette([testFile]);
         proc.stdout.pipe(process.stdout);
         proc.stderr.pipe(process.stderr);
