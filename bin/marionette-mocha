@@ -67,7 +67,7 @@ parser.addArgument(['--ui'], {
 parser.addArgument(['--host'], {
   type: require,
   help: 'host module to use defaults to marionette-b2gdesktop-host',
-  defaultValue: __dirname + '/../host'
+  defaultValue: __dirname + '/../host/v2'
 });
 
 parser.addArgument(['--reporter'], {
@@ -176,7 +176,7 @@ function main(argv) {
   var runner = new Parent(mochaArgs);
   runner.run({
     host: {
-      constructor: args[0].host,
+      module: args[0].host,
       options: extractOptionsFromModule(args[0], hostActions)
     },
 

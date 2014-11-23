@@ -15,4 +15,4 @@ npm-debug.log
 api-design
 /node_modules/
 /b2g
-
+/host/python/runner-service/gaia_runner_service.egg-info
