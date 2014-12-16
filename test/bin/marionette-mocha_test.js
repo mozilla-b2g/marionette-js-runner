@@ -1,4 +1,5 @@
 suite('mocha integration', function() {
+  this.timeout('30s');
   var fs = require('fs');
   var fsPath = require('path');
 

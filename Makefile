@@ -30,10 +30,5 @@ test-logger:
 .PHONY: test-unit
 test-unit:
 	./node_modules/.bin/mocha -t 100s \
-		test/childrunner.js \
-		test/parentrunner.js \
-		test/optsfileparser.js \
-		test/runtime/*.js \
-		test/bin/sigint.js \
-		test/bin/marionette-mocha.js \
-		test/bin/apply-manifest.js
+		test/*_test.js \
+		test/bin/*_test.js
