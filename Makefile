@@ -1,21 +1,20 @@
-default: lint test
+default: b2g node_modules
 
-b2g:
+b2g: node_modules
 	./node_modules/.bin/mozilla-download \
 		--product b2g \
 		--channel tinderbox \
 		--branch mozilla-central $@
 
+node_modules: package.json
+	npm install
+
 .PHONY: clean
 clean:
 	rm -rf b2g/ node_modules/
 
-.PHONY: node_modules
-node_modules:
-	npm install
-
 .PHONY: test
-test: node_modules b2g test-unit test-integration
+test: default lint test-unit test-integration
 
 .PHONY: lint
 lint:
@@ -27,10 +26,6 @@ lint:
 test-integration:
 	./bin/marionette-mocha --host-log stdout $(shell find test/integration) -t 100s
 
-.PHONY: test-logger
-test-logger:
-	./bin/marionette-mocha test/logger/console-proxy.js -t 100s --verbose
-
 .PHONY: test-unit
 test-unit:
 	./node_modules/.bin/mocha -t 100s \
@@ -41,3 +36,7 @@ test-unit:
 		test/bin/sigint.js \
 		test/bin/marionette-mocha.js \
 		test/bin/apply-manifest.js
+
+.PHONY: test-logger
+test-logger:
+	./bin/marionette-mocha test/logger/console-proxy.js -t 100s --verbose
