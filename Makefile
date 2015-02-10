@@ -6,6 +6,10 @@ b2g:
 		--channel tinderbox \
 		--branch mozilla-central $@
 
+.PHONY: clean
+clean:
+	rm -rf b2g/ node_modules/
+
 .PHONY: node_modules
 node_modules:
 	npm install
@@ -17,7 +21,7 @@ test: node_modules b2g test-unit test-integration
 lint:
 	gjslint --recurse . \
 		--disable "220,225" \
-		--exclude_directories "examples,node_modules,b2g,api-design,host"
+		--exclude_directories "api-design,b2g,examples,host,node_modules,venv"
 
 .PHONY: test-integration
 test-integration:
