@@ -32,6 +32,18 @@ function requireReporter(path) {
 }
 
 /**
+ * Helper to import the marionette desired capabilities
+ */
+function importDesiredCapabilities(path) {
+  try {
+    return require(path);
+  } catch (e) {
+    // Can not parse marionette desired capabilities file.
+    return;
+  }
+}
+
+/**
 Convert this host log argument into a stream (not done as a type to avoid
 destructive operations when calling --help)
 */
@@ -106,6 +118,12 @@ parser.addArgument(['--mocha-flags'], {
   help: 'Show mocha specific help/arguments',
   dest: 'mochaFlags',
   action: 'storeTrue'
+});
+
+parser.addArgument(['--marionette-capabilities'], {
+  type: importDesiredCapabilities,
+  dest: 'desiredCapabilities',
+  help: 'Path tp marionette desired capabilities file (*.json)'
 });
 
 var argv = ['test/', 'tests/', '.'].reduce(function(argv, path) {
@@ -191,6 +209,8 @@ function main(argv) {
     },
 
     profileBase: args[0].profileBase,
+
+    desiredCapabilities: args[0].desiredCapabilities,
 
     hostLog: hostLogStream(args[0].hostLog),
 
