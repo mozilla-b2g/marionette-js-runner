@@ -143,6 +143,26 @@ suite('mocha integration', function() {
     });
   });
 
+  suite('--marionette-capabilities', function() {
+    var result,
+    capabilitiesPath = __dirname + '/fixtures/capabilities.json',
+    expected = JSON.stringify({ capabilities: require(capabilitiesPath) }),
+    argv = [
+      '--marionette-capabilities', capabilitiesPath,
+      '--host-log', 'stdout',
+      __dirname + '/fixtures/marionettetest'
+    ];
+
+    setup(function(done) {
+      var proc = spawnMarionette(argv);
+      result = waitForProcess(proc, done);
+    });
+
+    test('desired capabilities are set', function() {
+      assert.ok(result.stdoutRaw.indexOf(expected) !== -1);
+    });
+  });
+
   suite('--host-log=stdout', function() {
     var result,
     argv = [
