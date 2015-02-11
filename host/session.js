@@ -1,15 +1,14 @@
 'use strict';
 
+var Promise = require('promise');
 var assert = require('assert');
 var assign = require('object-assign');
 var fsPath = require('path');
 var util = require('util');
 var indent = require('indent-string');
+var mozrunner = require('mozilla-runner');
 
-var Promise = require('promise');
-
-var detectBinary =
-  Promise.denodeify(require('mozilla-runner/lib/detectbinary').detectBinary);
+var detectBinary = Promise.denodeify(mozrunner.detectBinary);
 
 var DEFAULT_LOCATION = fsPath.join(process.cwd(), 'b2g');
 
@@ -20,12 +19,15 @@ Figure out where the b2g-bin lives based on options.
 @return {Promise<Null|String>} null if none is needed or a path.
 */
 function resolveBinary(options) {
-  return Promise.resolve().then(function() {
-    if (options.buildapp !== 'desktop') return;
-    if (options.runtime) return options.runtime;
+  if (options.buildapp !== 'desktop') {
+    return Promise.resolve();
+  }
+  if (options.runtime) {
+    return Promise.resolve(options.runtime);
+  }
 
-    return detectBinary(options.target || DEFAULT_LOCATION, { product: 'b2g' });
-  });
+  var binary = options.target || DEFAULT_LOCATION;
+  return detectBinary(binary, { product: 'b2g' });
 }
 
 function Session(host, id, options) {

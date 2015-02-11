@@ -11,7 +11,7 @@ node_modules: package.json
 
 .PHONY: clean
 clean:
-	rm -rf b2g/ node_modules/
+	rm -rf b2g/ node_modules/ venv/
 
 .PHONY: test
 test: default lint test-unit test-integration

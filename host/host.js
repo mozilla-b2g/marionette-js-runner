@@ -1,12 +1,12 @@
 'use strict';
 
+var EventEmitter = require('events').EventEmitter;
+var Promise = require('promise');
 var spawn = require('child_process').spawn;
 var uuid = require('uuid');
 var request = require('./lib/request');
 var assert = require('assert');
-
-var EventEmitter = require('events').EventEmitter;
-var Promise = require('promise');
+var _ = require('lodash');
 
 var VENV = __dirname + '/../venv';
 
@@ -23,14 +23,15 @@ variables are not set which conflict.
 function spawnVirtualEnv(bin, argv, opts) {
   opts = opts || {};
   // Clone current environment variables...
-  var env = opts.env = {};
-  for (var key in process.env) env[key] = process.env[key];
+  var env = {};
+  _.assign(env, process.env);
+  opts.env = env;
 
-  // Add binary wrappers to top most of the path...
-  env['PATH'] = VENV + '/bin/:' + process.env.PATH;
+  // Prepend binary wrappers to path.
+  env.PATH = VENV + '/bin/:' + process.env.PATH;
 
   // Ensure we don't conflict with other wrappers or package managers.
-  delete env['PYTHONHOME'];
+  delete env.PYTHONHOME;
 
   return spawn(bin, argv, opts);
 }
@@ -45,6 +46,7 @@ function Host(socketPath, process, log) {
 
   EventEmitter.call(this);
 }
+module.exports = Host;
 
 Host.prototype = {
   __proto__: EventEmitter.prototype,
@@ -56,18 +58,25 @@ Host.prototype = {
       return Promise.all(this.pendingSessions).then(this.destroy.bind(this));
     }
 
-    var sessions = Object.keys(this.sessions).map(function(id) {
-      return this.sessions[id].destroy();
-    }, this);
+    var deleteSessions = Promise.all(
+      _.map(this.sessions, function(session) {
+        return session.destroy();
+      })
+    );
 
-    return Promise.all(sessions).then(function() {
+    return Promise.all(
+      _.map(this.sessions, function(session) {
+        return session.destroy();
+      })
+    )
+    .then(function() {
+      if (Object.keys(this.sessions).length !== 0) {
+        return Promise.reject(new Error('Not all sessions were deleted!'));
+      }
+
       return new Promise(function(accept) {
-        assert(
-          Object.keys(this.sessions).length === 0,
-          'all sessions removed.'
-        );
-        this.process.kill();
         this.process.once('exit', accept);
+        this.process.kill();
       }.bind(this));
     }.bind(this));
   },
@@ -81,38 +90,31 @@ Host.prototype = {
 };
 
 Host.create = function() {
-  return new Promise(function(accept, reject) {
-    var socketPath = '/tmp/marionette-socket-host-' + uuid.v1() + '.sock';
+  var socketPath = '/tmp/marionette-socket-host-' + uuid.v1() + '.sock';
+  var pythonChild = spawnVirtualEnv(
+    'gaia-integration',
+    ['--path=' + socketPath],
+    { stdio: [0, 1, 2, 'pipe'] }
+  );
 
-    var pythonChild = spawnVirtualEnv('gaia-integration',
-      ['--path=' + socketPath],
-      { stdio: [0, 1, 2, 'pipe'] }
-    );
-
-    // Until we get ready start any errors will trigger the callback.
-    pythonChild.on('error', reject);
-
-    // Ensure if we exit for some reason during boot errors are reported...
-    function earlyExitHandler() {
-      // Ensure we don't call error callbck somehow...
+  var failOnChildError = new Promise(function(accept, reject) {
+    pythonChild.addListener('error', reject);
+    pythonChild.once('exit', function(exit) {
+      // Ensure we don't call error callback somehow...
       pythonChild.removeListener('error', reject);
-      reject(
-        new Error('Unexpected exit of gaia-integration during connect...')
-      );
-    }
-    pythonChild.once('exit', earlyExitHandler);
+      reject(new Error(
+        'Unexpected exit during connect: ' +
+        'signal = ' + exit.signal + ', ' +
+        'code = ' + exit.code
+      ));
+    });
+  });
 
-    request(socketPath, '/connect')
-      .then(function() {
-        pythonChild.removeListener('exit', earlyExitHandler);
-        pythonChild.removeListener('error', reject);
+  var connect = request(socketPath, '/connect').then(function() {
+    pythonChild.removeAllListeners('error');
+    pythonChild.removeAllListeners('exit');
+    return new Host(socketPath, pythonChild, pythonChild.stdio[3]);
+  });
 
-        return new Host(socketPath, pythonChild, pythonChild.stdio[3]);
-      })
-      .then(accept)
-      .catch(reject);
-
-  }.bind(this));
+  return Promise.race([connect, failOnChildError]);
 };
-
-module.exports = Host;

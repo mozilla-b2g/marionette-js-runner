@@ -23,6 +23,10 @@ suite('SIGINT', function() {
         var obj = {};
         lineParts.forEach(function(part, idx) {
           // lower case to better fit node conventions...
+          if (!columns[idx]) {
+            return;
+          }
+
           obj[columns[idx].toLowerCase()] = part;
         });
         result.push(obj);

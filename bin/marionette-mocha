@@ -2,7 +2,6 @@
 
 var ArgumentParser = require('argparse').ArgumentParser;
 var Runner = require('../lib/runner');
-
 var assert = require('assert');
 var fs = require('fs');
 var fsPath = require('path');
@@ -10,53 +9,6 @@ var resolveModule = require('../lib/resolvemodule');
 var requireResolve = require('../lib/require_resolve');
 
 var OPTS_FILE = 'marionette-mocha.opts';
-
-function showMochaHelp() {
-  var mochaBin = resolveModule('mocha', 'bin', 'mocha');
-  var proc = require('child_process').spawn(
-    mochaBin, ['--help'], { stdio: 'inherit' }
-  );
-
-  proc.once('exit', process.exit);
-}
-
-/**
-Helper to import the mocha reporters...
-*/
-function requireReporter(path) {
-  try {
-    return require(argv.reporter);
-  } catch (e) {
-    return require('mocha/lib/reporters/' + (path || 'dot'));
-  }
-}
-
-/**
- * Helper to import the marionette desired capabilities
- */
-function importDesiredCapabilities(path) {
-  try {
-    return require(path);
-  } catch (e) {
-    // Can not parse marionette desired capabilities file.
-    return;
-  }
-}
-
-/**
-Convert this host log argument into a stream (not done as a type to avoid
-destructive operations when calling --help)
-*/
-function hostLogStream(value) {
-  switch (value) {
-    case 'stderr':
-      return process.stderr;
-    case 'stdout':
-      return process.stdout;
-    default:
-      return fs.createWriteStream(value);
-  }
-}
 
 var parser = new ArgumentParser({
   version: require('../package').version,
@@ -140,30 +92,6 @@ var argv = ['test/', 'tests/', '.'].reduce(function(argv, path) {
   return argv;
 }, process.argv);
 
-/**
-@param {argparse.ArgumentParser} parser to extend.
-@param {Object} module to use to extend parser.
-@return {Array[argparse.Action]} list of actions.
-*/
-function extendParserWithModule(parser, module) {
-  if (!module.help) return [];
-  var help = module.help;
-  assert(help.group, '.help must contain ".group"');
-  assert(help.arguments, '.help must contain ".arguments"');
-
-  var group = parser.addArgumentGroup(help.group);
-  return Object.keys(help.arguments).map(function(arg) {
-    return group.addArgument([arg], help.arguments[arg]);
-  });
-}
-
-function extractOptionsFromModule(parsedArgs, actions) {
-  return actions.reduce(function(result, action) {
-    result[action.dest] = parsedArgs[action.dest];
-    return result;
-  }, {});
-}
-
 function main(argv) {
   // Initial parser pass to pick up the hosts... This generally won't fail except
   // in the case of serious argument parsing errors.
@@ -235,6 +163,79 @@ function main(argv) {
       });
     });
   });
+}
+
+function showMochaHelp() {
+  var mochaBin = resolveModule('mocha', 'bin', 'mocha');
+  var proc = require('child_process').spawn(
+    mochaBin, ['--help'], { stdio: 'inherit' }
+  );
+
+  proc.once('exit', process.exit);
+}
+
+/**
+Helper to import the mocha reporters...
+*/
+function requireReporter(path) {
+  var reporter;
+  try {
+    reporter = require(argv.reporter);
+  } catch (e) {
+    reporter = require('mocha/lib/reporters/' + (path || 'dot'));
+  }
+
+  return reporter;
+}
+
+/**
+ * Helper to import the marionette desired capabilities
+ */
+function importDesiredCapabilities(path) {
+  try {
+    return require(path);
+  } catch (e) {
+    // Cannot parse marionette desired capabilities file.
+    return;
+  }
+}
+
+/**
+Convert this host log argument into a stream (not done as a type to avoid
+destructive operations when calling --help)
+*/
+function hostLogStream(value) {
+  switch (value) {
+    case 'stderr':
+    case 'stdout':
+      return process[value];
+    default:
+      return fs.createWriteStream(value);
+  }
+}
+
+/**
+@param {argparse.ArgumentParser} parser to extend.
+@param {Object} module to use to extend parser.
+@return {Array[argparse.Action]} list of actions.
+*/
+function extendParserWithModule(parser, module) {
+  if (!module.help) return [];
+  var help = module.help;
+  assert(help.group, '.help must contain ".group"');
+  assert(help.arguments, '.help must contain ".arguments"');
+
+  var group = parser.addArgumentGroup(help.group);
+  return Object.keys(help.arguments).map(function(arg) {
+    return group.addArgument([arg], help.arguments[arg]);
+  });
+}
+
+function extractOptionsFromModule(parsedArgs, actions) {
+  return actions.reduce(function(result, action) {
+    result[action.dest] = parsedArgs[action.dest];
+    return result;
+  }, {});
 }
 
 if (require.main === module) {
