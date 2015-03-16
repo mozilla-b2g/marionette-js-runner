@@ -132,7 +132,15 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         return { 'id': start_id }
 
     def do_stop_runner(self, payload):
-        handler = self.REQUESTS.pop(payload['id'])
+        payload_id = payload['id']
+        if not payload_id in self.REQUESTS:
+            runner_ids = join(
+                ', ',
+                map(lambda key: str(key), self.REQUESTS.keys()))
+            msg = 'Cannot stop %s - service has %s' % (payload_id, runner_ids)
+            raise Exception(msg)
+
+        handler = self.REQUESTS.pop(payload_id)
         handler.stop_runner()
         handler.cleanup()
         return {}
