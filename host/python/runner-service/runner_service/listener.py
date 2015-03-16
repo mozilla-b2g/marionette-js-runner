@@ -15,6 +15,7 @@ from .handlers import runner_handlers
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     REQUESTS = {}
+    INACTIVE = []
 
     def log_message(self, format, *args):
         '''
@@ -134,12 +135,19 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_stop_runner(self, payload):
         payload_id = payload['id']
         if not payload_id in self.REQUESTS:
-            runner_ids = join(
+            if payload_id in self.INACTIVE:
+                sys.stderr.write(
+                    'Received request to stop ' +
+                    payload_id +
+                    ' but already stopped so nothing to do.\n')
+                return {}
+            runner_ids = str.join(
                 ', ',
-                map(lambda key: str(key), self.REQUESTS.keys()))
+                map(lambda x: str(x), self.REQUESTS.keys() + self.INACTIVE))
             msg = 'Cannot stop %s - service has %s' % (payload_id, runner_ids)
             raise Exception(msg)
 
+        self.INACTIVE.append(payload_id)
         handler = self.REQUESTS.pop(payload_id)
         handler.stop_runner()
         handler.cleanup()
