@@ -19,7 +19,6 @@ function Host(socketPath, process, log) {
   this.log = log;
   this.sessions = {};
   this.pendingSessions = [];
-
   this.error = null;
 
   this.onerror = this.onerror.bind(this);
