@@ -2,8 +2,7 @@ default: b2g node_modules
 
 b2g: node_modules
 	./node_modules/.bin/mozilla-download \
-		--product b2g \
-		--channel tinderbox \
+		--product b2g-desktop \
 		--branch mozilla-central $@
 
 node_modules: package.json
