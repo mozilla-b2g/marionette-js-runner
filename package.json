@@ -27,7 +27,7 @@
     "indent-string": "^1.2.0",
     "intersect": "~0.0.3",
     "lodash": "3.1.0",
-    "marionette-js-logger": "0.1.4",
+    "marionette-js-logger": "0.2.1",
     "marionette-profile-builder": "0.0.3",
     "mkdirp": "^0.5.0",
     "mocha-json-proxy": "~0.0.2",
