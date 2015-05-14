@@ -44,7 +44,7 @@
   "devDependencies": {
     "marionette-client": "1.7.x",
     "mocha": "~2.0.0",
-    "mozilla-download": "0.5.1",
+    "mozilla-download": "1.0.x",
     "sinon": "~1.7"
   },
 
